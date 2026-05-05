@@ -1,226 +1,5 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danny's English Interactive Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        :root {
-            --primary: #27ae60;
-            --primary-dark: #1e8449;
-            --bg: #f4fcf7;
-            --card-bg: #ffffff;
-            --text: #2d3436;
-            --shadow: 0 8px 15px rgba(0,0,0,0.05);
-            --shadow-h: 0 15px 30px rgba(39, 174, 96, 0.15);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg);
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-        }
-
-        /* LOGIN SCREEN STYLES */
-        #login-screen {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100%; height: 100vh; text-align: center;
-        }
-        .login-card {
-            background: white; padding: 50px; border-radius: 30px; box-shadow: var(--shadow);
-            max-width: 400px; width: 90%;
-        }
-        .google-btn {
-            background: white; color: #444; border: 1px solid #ddd; padding: 12px 25px;
-            border-radius: 50px; cursor: pointer; font-weight: bold; display: flex;
-            align-items: center; gap: 10px; margin: 20px auto; transition: 0.3s;
-        }
-        .google-btn:hover { background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
-
-        /* USER BAR */
-        .user-bar {
-            position: fixed; top: 15px; right: 20px; display: flex; align-items: center;
-            gap: 15px; background: white; padding: 8px 18px; border-radius: 50px;
-            box-shadow: var(--shadow); z-index: 1000; font-size: 0.9rem;
-        }
-        .btn-logout {
-            background: #eee; border: none; padding: 5px 12px; border-radius: 20px;
-            cursor: pointer; color: #666; font-weight: bold;
-        }
-
-        /* MAIN APP CONTAINER */
-        .container { width: 100%; max-width: 1000px; text-align: center; padding: 20px; display: none; }
-
-        /* GIỮ NGUYÊN CÁC CSS CŨ CỦA BẠN DƯỚI ĐÂY */
-        .progress-container { width: 100%; height: 10px; background: #e0e0e0; border-radius: 10px; margin-bottom: 20px; display: none; overflow: hidden; }
-        .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.3s ease; }
-        .main-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px; }
-        .menu-card { background: white; padding: 50px 20px; border-radius: 30px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.3s ease-out; border: 1px solid transparent; }
-        .menu-card:hover { transform: translateY(-12px); box-shadow: var(--shadow-h); border-color: rgba(39, 174, 96, 0.3); }
-        .menu-card h2 { font-size: 2.2rem; color: var(--primary); margin: 0; }
-        .mode-overlay { display: none; gap: 15px; justify-content: center; margin-top: 25px; animation: fadeIn 0.3s; }
-        .btn-mode { padding: 10px 22px; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-mode:hover { background: var(--primary); color: white; }
-        #flashcard-section { display: none; max-width: 700px; margin: 0 auto; }
-        .card-container { perspective: 1200px; width: 100%; height: 450px; margin-bottom: 30px; }
-        .card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card.flipped { transform: rotateY(180deg); }
-        .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; border-radius: 40px; box-shadow: var(--shadow); box-sizing: border-box; background: white; }
-        .front { border: 1px solid #eee; }
-        .back { transform: rotateY(180deg); border: 3px solid var(--primary); }
-        .card-btn { position: absolute; top: 20px; left: 20px; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; border: none; background: #f8f9fa; font-size: 1.6rem; transition: 0.2s; z-index: 100; color: #636e72; }
-        .card-btn:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .speaker-btn-inline { margin-top: 25px; font-size: 3.5rem; cursor: pointer; transition: transform 0.2s; user-select: none; }
-        .term-main { font-size: 3.2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; line-height: 1.2; }
-        .ipa { font-size: 1.5rem; color: #95a5a6; margin-bottom: 15px; }
-        .mean-text { font-size: 2.2rem; color: var(--primary); font-style: italic; }
-        .ex-label { font-size: 1.2rem; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 20px; letter-spacing: 2px; }
-        .ex-text { font-size: 2rem; line-height: 1.5; color: #2d3436; font-weight: 600; text-align: center; }
-        .ex-vi { font-size: 1.6rem; margin-top: 25px; color: #7f8c8d; font-style: italic; text-align: center; }
-        .nav-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
-        .btn-nav { padding: 16px 40px; border: none; border-radius: 20px; font-size: 1.3rem; font-weight: bold; cursor: pointer; background: var(--primary); color: white; box-shadow: 0 6px 0 var(--primary-dark); }
-        .btn-prev { background: #636e72; box-shadow: 0 6px 0 #2d3436; }
-        .btn-flip-outer { width: 70px; height: 70px; border-radius: 50%; border: none; background: #e3f2fd; color: #448aff; font-size: 1.8rem; cursor: pointer; box-shadow: 0 6px 0 #bbdefb; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        #list-selection { display: none; background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow); }
-        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin: 30px 0; }
-        .item-box { padding: 20px; background: #ffffff; border-radius: 15px; cursor: pointer; font-weight: bold; border: 1px solid #eee; border-bottom: 4px solid #eee; transition: all 0.3s ease-out; }
-        #congrats-screen { display: none; background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow); }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body>
-
-<div id="login-screen">
-    <div class="login-card">
-        <h1 style="color: var(--primary); margin-bottom: 10px;">Danny's English Hub</h1>
-        <p style="color: #666;">Vui lòng đăng nhập để tiếp tục</p>
-        <button id="login-btn" class="google-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="18">
-            Tiếp tục với Google
-        </button>
-        <p id="login-msg" style="color: #ff7675; font-size: 0.9rem;"></p>
-    </div>
-</div>
-
-<div id="user-bar-container" style="display: none;">
-    <div class="user-bar">
-        <span id="user-welcome"></span>
-        <button id="logout-btn" class="btn-logout">Đăng xuất</button>
-    </div>
-</div>
-
-<div class="container" id="main-app-screen">
-    <div id="home-screen">
-        <h1 style="font-size: 3.2rem; color: var(--primary-dark); margin-bottom: 5px;">Danny's English Hub</h1>
-        <p style="color: #636e72; font-size: 1.2rem; margin-bottom: 40px;">Active Recall & Spaced Repetition</p>
-        
-        <div class="main-menu">
-            <div class="menu-card" onclick="toggleModes('vocab')">
-                <h2>Thẻ Từ Vựng</h2>
-                <div id="modes-vocab" class="mode-overlay">
-                    <button class="btn-mode" onclick="start('vocab', 'auto', event)">Thứ tự</button>
-                    <button class="btn-mode" onclick="start('vocab', 'list', event)">Riêng lẻ</button>
-                </div>
-            </div>
-            <div class="menu-card" onclick="toggleModes('phrase')">
-                <h2>Thẻ Mẫu Câu</h2>
-                <div id="modes-phrase" class="mode-overlay">
-                    <button class="btn-mode" onclick="start('phrase', 'auto', event)">Thứ tự</button>
-                    <button class="btn-mode" onclick="start('phrase', 'list', event)">Riêng lẻ</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="list-selection">
-        <h2 style="font-size: 2.2rem; color: var(--primary);">Chọn bài học</h2>
-        <div id="items-grid" class="grid-items"></div>
-        <button class="btn-mode" onclick="goHome()">Quay lại Menu</button>
-    </div>
-
-    <div id="flashcard-section">
-        <div class="progress-container" id="p-container">
-            <div class="progress-bar" id="p-bar"></div>
-        </div>
-        <div class="card-container">
-            <div class="card" id="main-card">
-                <div class="front">
-                    <button class="card-btn" onclick="goBackFromCard(event)">🏠</button>
-                    <div id="display-term" class="term-main"></div>
-                    <div id="display-ipa" class="ipa"></div>
-                    <div id="display-mean" class="mean-text"></div>
-                    <div class="speaker-btn-inline" onclick="speak(event)">🔊</div>
-                </div>
-                <div class="back">
-                    <button class="card-btn" onclick="goBackFromCard(event)">🏠</button>
-                    <div class="ex-label">Đáp án hoàn chỉnh</div>
-                    <div id="display-ex" class="ex-text"></div>
-                    <div id="display-ex-vi" class="ex-vi"></div>
-                    <div class="speaker-btn-inline" onclick="speak(event)">🔊</div>
-                </div>
-            </div>
-        </div>
-        <div class="nav-controls">
-            <button class="btn-nav btn-prev" onclick="prev()">Trước</button>
-            <button class="btn-flip-outer" onclick="flipCard()">🔄</button>
-            <button class="btn-nav" id="next-btn" onclick="next()">Tiếp theo</button>
-        </div>
-    </div>
-
-    <div id="congrats-screen">
-        <h1 style="font-size: 3rem; color: var(--primary);">Tuyệt vời! 🎉</h1>
-        <p style="font-size: 1.5rem; color: #636e72;">Bạn đã hoàn thành bộ thẻ này.</p>
-        <button class="btn-nav" style="margin-top: 30px;" onclick="goHome()">Quay lại Menu</button>
-    </div>
-</div>
-
-<script type="module">
-    // FIREBASE INTEGRATION
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
-        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-        projectId: "nguyen-am-tieng-anh",
-        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-        messagingSenderId: "878440633705",
-        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const provider = new GoogleAuthProvider();
-
-    // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById("user-welcome").innerText = "Hi, " + user.displayName;
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-app-screen").style.display = "block";
-            document.getElementById("user-bar-container").style.display = "block";
-        } else {
-            document.getElementById("login-screen").style.display = "flex";
-            document.getElementById("main-app-screen").style.display = "none";
-            document.getElementById("user-bar-container").style.display = "none";
-        }
-    });
-
-    document.getElementById("login-btn").onclick = async () => {
-        try { await signInWithPopup(auth, provider); } 
-        catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
-    };
-
-    document.getElementById("logout-btn").onclick = async () => {
-        await signOut(auth);
-        location.reload();
-    };
-</script>
-
 <script>
-    // GAME LOGIC CỦA BẠN (GIỮ NGUYÊN)
+    // GAME LOGIC
     const database = {
         vocab: [
             { term: "a student", ipa: "/ə ˈstjuːdnt/", mean: "sinh viên", ex: "I am a student, and I study film at university.", vi: "Tôi là một sinh viên, và tôi học điện ảnh tại đại học." },
@@ -243,24 +22,24 @@
             { term: "quiet", ipa: "/ˈkwaɪət/", mean: "ít nói", ex: "I'm quiet.", vi: "Tôi là người ít nói." }
         ],
         phrase: [
-            { term: "I study ___ at university", mean: "(môn/ngành)", ex: "I study film at university.", vi: "Tôi học điện ảnh tại đại học." },
-            { term: "I live with ___", mean: "(người sống cùng)", ex: "I live with my mother and my sister.", vi: "Tôi sống cùng mẹ và em gái." },
-            { term: "I love + ___", mean: "(N/V-ing)", ex: "I love music / I love listening to music.", vi: "Tôi yêu âm nhạc / yêu việc nghe nhạc." },
-            { term: "I am + ___", mean: "(quốc tịch)", ex: "I am English.", vi: "Tôi là người Anh." },
-            { term: "I am from + ___", mean: "(nước)", ex: "I am from London.", vi: "Tôi đến từ London." },
-            { term: "This is + ___", mean: "(người cần giới thiệu)", ex: "This is my sister Ruby.", vi: "Đây là em gái tôi, Ruby." },
-            { term: "She is/I am + a/an + ___", mean: "(nghề nghiệp)", ex: "She is a translator.", vi: "Cô ấy là một thông dịch viên." },
-            { term: "She is + a/an + ___ + person", mean: "(tính cách)", ex: "She is a really nice person.", vi: "Cô ấy là một người rất tốt bụng." },
-            { term: "I am passionate about + ___", mean: "(V/N)", ex: "She is passionate about the environment.", vi: "Cô ấy đam mê bảo vệ môi trường." },
-            { term: "Let's ask + ___ + some questions", mean: "(tân ngữ)", ex: "Let's ask her some questions.", vi: "Hãy hỏi cô ấy vài câu hỏi nào." },
-            { term: "What languages do you speak, ___?", mean: "(tên người)", ex: "What languages do you speak, Ruby?", vi: "Bạn nói ngôn ngữ gì vậy, Ruby?" },
+            { term: "I study ___ at university", mean: "ngành học", ex: "I study film at university.", vi: "Tôi học điện ảnh tại đại học." },
+            { term: "I live with ___", mean: "người sống cùng", ex: "I live with my mother and my sister.", vi: "Tôi sống cùng mẹ và em gái." },
+            { term: "I love + ___", mean: "N/V-ing", ex: "I love music / I love listening to music.", vi: "Tôi yêu âm nhạc / yêu việc nghe nhạc." },
+            { term: "I am + ___", mean: "quốc tịch", ex: "I am English.", vi: "Tôi là người Anh." },
+            { term: "I am from + ___", mean: "nước", ex: "I am from London.", vi: "Tôi đến từ London." },
+            { term: "This is + ___", mean: "người được giới thiệu", ex: "This is my sister Ruby.", vi: "Đây là em gái tôi, Ruby." },
+            { term: "She is/I am + a/an + ___", mean: "nghề nghiệp", ex: "She is a translator.", vi: "Cô ấy là một thông dịch viên." },
+            { term: "She is + a/an + ___ + person", mean: "tính cách", ex: "She is a really nice person.", vi: "Cô ấy là một người rất tốt bụng." },
+            { term: "I am passionate about + ___", mean: "V/N", ex: "She is passionate about the environment.", vi: "Cô ấy đam mê bảo vệ môi trường." },
+            { term: "Let's ask + ___ + some questions", mean: "tân ngữ", ex: "Let's ask her some questions.", vi: "Hãy hỏi cô ấy vài câu hỏi nào." },
+            { term: "What languages do you speak, ___?", mean: "tên người", ex: "What languages do you speak, Ruby?", vi: "Bạn nói ngôn ngữ gì vậy, Ruby?" },
             { term: "Do you prefer A or B?", mean: "Bạn thích A hay B hơn?", ex: "Do you prefer life in England or Italy?", vi: "Bạn thích sống ở Anh hay Ý hơn?" },
-            { term: "I prefer A because I like ___", mean: "(lý do)", ex: "I prefer Naples because I like the sun and the sea.", vi: "Tôi thích Naples vì tôi thích nắng và biển." },
+            { term: "I prefer A because I like ___", mean: "lý do", ex: "I prefer Naples because I like the sun and the sea.", vi: "Tôi thích Naples vì tôi thích nắng và biển." },
             { term: "What do you do exactly?", mean: "Chính xác thì bạn làm gì?", ex: "You're a translator. What do you do exactly?", vi: "Chính xác thì bạn làm nghề gì?" },
-            { term: "say something about your life ___", mean: "(ngoài công việc)", ex: "Say something about your life outside of work.", vi: "Hãy kể về cuộc sống ngoài công việc của bạn." },
-            { term: "I want to learn ___", mean: "(kỹ năng)", ex: "One day I want to learn the piano.", vi: "Một ngày nào đó tôi muốn học piano." },
+            { term: "say something about your life ___", mean: "ngoài công việc", ex: "Say something about your life outside of work.", vi: "Hãy kể về cuộc sống ngoài công việc của bạn." },
+            { term: "I want to learn ___", mean: "kỹ năng", ex: "One day I want to learn the piano.", vi: "Một ngày nào đó tôi muốn học piano." },
             { term: "What's your favourite song?", mean: "Bài hát yêu thích là gì?", ex: "What's your favourite song? - Umbrella.", vi: "Bài hát yêu thích của bạn là gì? - Umbrella." },
-            { term: "Describe yourself in ___ adjectives", mean: "(số lượng)", ex: "Describe yourself in two adjectives.", vi: "Miêu tả bản thân bằng hai tính từ." },
+            { term: "Describe yourself in ___ adjectives", mean: "số lượng", ex: "Describe yourself in two adjectives.", vi: "Miêu tả bản thân bằng hai tính từ." },
             { term: "I hope (so)", mean: "Hy vọng vậy", ex: "I'm kind, I hope.", vi: "Tôi tốt bụng, tôi hy vọng thế." },
             { term: "Pleasure / You're welcome", mean: "Không có chi", ex: "Thank you. - Pleasure.", vi: "Cảm ơn bạn. - Rất sẵn lòng." }
         ]
@@ -289,10 +68,32 @@
     }
 
     function showList() {
-        const grid = document.getElementById('items-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('items-grid'); 
+        grid.innerHTML = '';
+        
         database[curCat].forEach((item, i) => {
-            const d = document.createElement('div'); d.className = 'item-box';
-            d.textContent = item.term; d.onclick = () => { curIdx = i; showCard(); };
+            const d = document.createElement('div'); 
+            d.className = 'item-box';
+            
+            // LOGIC HIỂN THỊ CẤU TRÚC RÕ RÀNG
+            if (curCat === 'phrase') {
+                let displayHTML = item.term;
+                // Nếu có dấu gạch dưới ___
+                if (item.term.includes('___')) {
+                    displayHTML = item.term.replace('___', `<span style="color: var(--primary);"> [${item.mean}] </span>`);
+                } 
+                // Nếu có dấu +
+                else if (item.term.includes('+')) {
+                    displayHTML = item.term.split('+').map(part => part.trim()).join(' <span style="color: var(--primary);">+</span> ');
+                    // Thêm phần giải thích vào cuối nếu cần hoặc chèn vào giữa dấu +
+                    displayHTML = displayHTML.replace('+', `+ <small style="color: var(--primary-dark)">${item.mean}</small> +`);
+                }
+                d.innerHTML = displayHTML;
+            } else {
+                d.textContent = item.term; 
+            }
+
+            d.onclick = () => { curIdx = i; showCard(); };
             grid.appendChild(d);
         });
         document.getElementById('list-selection').style.display = 'block';
@@ -327,12 +128,15 @@
         else if (curMode === 'auto') { finish(); }
     }
     window.prev = function() { if (curIdx > 0) { curIdx--; update(); } }
+    
     function finish() {
         document.getElementById('flashcard-section').style.display = 'none';
         document.getElementById('congrats-screen').style.display = 'block';
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#27ae60', '#2ecc71', '#ffffff'] });
     }
+
     window.goBackFromCard = function(e) { if(e) e.stopPropagation(); if (curMode === 'auto') goHome(); else showList(); }
+    
     window.goHome = function() {
         document.getElementById('home-screen').style.display = 'block';
         document.getElementById('flashcard-section').style.display = 'none';
@@ -340,6 +144,7 @@
         document.getElementById('congrats-screen').style.display = 'none';
         document.querySelectorAll('.mode-overlay').forEach(el => el.style.display = 'none');
     }
+
     window.speak = function(e) {
         if(e) e.stopPropagation();
         const card = document.getElementById('main-card');
@@ -349,5 +154,3 @@
         msg.lang = 'en-US'; window.speechSynthesis.speak(msg);
     }
 </script>
-</body>
-</html>
