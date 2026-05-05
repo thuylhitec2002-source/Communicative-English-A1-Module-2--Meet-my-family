@@ -3,238 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danny's English Quiz - Homestay</title>
+    <title>Danny's English Hub - Ocean Quiz</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --blue-primary: #3498db;
-            --blue-dark: #2980b9;
-            --blue-light: #ebf5fb;
-            --accent: #e74c3c;
+            --ocean-blue: #0077b6;
+            --ocean-dark: #023e8a;
+            --ocean-light: #caf0f8;
+            --bg-gradient: linear-gradient(135deg, #00b4d8, #0077b6);
             --correct: #27ae60;
-            --bg-deep: #2c3e50;
+            --wrong: #e74c3c;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: var(--bg-deep);
             margin: 0; padding: 0;
+            background: var(--bg-gradient);
+            min-height: 100vh;
             overflow-x: hidden;
-            color: #2d3436;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* ANIMATED BACKGROUND */
-        .area {
-            background: #4e54c8;  
-            background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);  
-            width: 100%; height:100vh; position: fixed; z-index: -1;
+        /* BACKGROUND ANIMATION */
+        .background-objects {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden;
         }
-        .circles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; margin:0; padding:0; }
-        .circles li { position: absolute; display: block; list-style: none; width: 20px; height: 20px; background: rgba(255, 255, 255, 0.2); animation: animate 25s linear infinite; bottom: -150px; }
-        .circles li:nth-child(1){ left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
-        .circles li:nth-child(2){ left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
-        .circles li:nth-child(3){ left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
-        .circles li:nth-child(4){ left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
-        @keyframes animate { 0%{ transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; } 100%{ transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; } }
+        .obj {
+            position: absolute; background: rgba(255, 255, 255, 0.15);
+            border-radius: 20%; animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
 
         /* LOGIN SCREEN */
-        #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .login-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; border: 3px solid var(--blue-primary); }
-
-        /* MAIN APP */
-        .container { max-width: 900px; margin: 40px auto; display: none; z-index: 1; position: relative; }
-        
-        .user-bar { background: white; padding: 10px 25px; border-radius: 50px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border: 2px solid var(--blue-primary); }
-
-        /* CONTENT BOARD */
-        .board { 
-            background: white; padding: 40px; border-radius: 30px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 3px solid transparent; margin-bottom: 30px;
-            text-align: left;
-        }
-        .board:hover { 
-            transform: translateY(-10px); 
-            border-color: var(--blue-primary); 
-            box-shadow: 0 15px 35px rgba(52, 152, 219, 0.3);
+        #login-screen { text-align: center; z-index: 10; }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95); padding: 50px;
+            border-radius: 30px; border: 4px solid var(--ocean-dark);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        .reading-text { background: var(--blue-light); padding: 20px; border-radius: 15px; line-height: 1.6; border-left: 5px solid var(--blue-primary); font-size: 1.1rem; }
-
-        /* QUIZ STYLES */
-        .question-block { margin-top: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
-        .options-group { margin-top: 10px; }
-        .option { 
-            display: block; padding: 12px; margin: 8px 0; border: 2px solid #eee; 
-            border-radius: 10px; cursor: pointer; transition: 0.2s; 
-        }
-        .option:hover { background: var(--blue-light); border-color: var(--blue-primary); }
-        input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
-
-        /* FEEDBACK COLORS */
-        .correct-ans { color: var(--correct); font-weight: bold; }
-        .wrong-ans { color: var(--accent); font-weight: bold; text-decoration: line-through; }
-        .explanation { 
-            margin-top: 10px; padding: 10px; background: #f9f9f9; 
-            border-radius: 8px; font-size: 0.95rem; display: none;
-            border-left: 3px solid var(--blue-primary);
+        /* MAIN CONTAINER */
+        .container { 
+            max-width: 900px; width: 95%; margin: 40px auto; 
+            display: none; z-index: 5; 
         }
 
-        .btn-check { 
-            background: var(--blue-primary); color: white; border: none; 
-            padding: 15px 40px; border-radius: 50px; font-size: 1.2rem; 
+        /* BOARD STYLES */
+        .board {
+            background: white; padding: 40px; border-radius: 35px;
+            border: 4px solid var(--ocean-blue);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .board:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 25px 50px rgba(2, 62, 138, 0.3);
+            border-color: var(--ocean-dark);
+        }
+
+        .reading-section {
+            background: var(--ocean-light); padding: 25px;
+            border-radius: 20px; border-left: 8px solid var(--ocean-blue);
+            margin-bottom: 30px; line-height: 1.6; font-size: 1.1rem;
+        }
+
+        /* QUIZ ELEMENTS */
+        .question-box {
+            padding: 20px; margin-bottom: 20px; border-radius: 15px;
+            background: #fff; border: 2px solid #f0f0f0; transition: 0.3s;
+        }
+        .question-box:hover { border-color: var(--ocean-light); }
+
+        .option-label {
+            display: block; padding: 12px 18px; margin: 8px 0;
+            border: 2px solid #eee; border-radius: 12px;
+            cursor: pointer; transition: 0.2s; font-weight: 500;
+        }
+        .option-label:hover { background: var(--ocean-light); }
+        input[type="radio"] { margin-right: 10px; transform: scale(1.3); }
+
+        /* RESULT STYLES */
+        .is-correct { color: var(--correct); font-weight: bold; border-color: var(--correct) !important; background: #eef9f1; }
+        .is-wrong { color: var(--wrong); font-weight: bold; border-color: var(--wrong) !important; background: #fdf2f2; }
+        .correct-hidden { font-weight: bold; color: var(--correct); text-decoration: underline; }
+        .explanation {
+            margin-top: 10px; padding: 12px; background: #f8f9fa;
+            border-radius: 10px; display: none; font-size: 0.95rem;
+            color: #555; border-left: 4px solid var(--ocean-blue);
+        }
+
+        .btn-action {
+            background: var(--ocean-blue); color: white; border: none;
+            padding: 15px 40px; border-radius: 50px; font-size: 1.2rem;
             font-weight: bold; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 5px 0 var(--blue-dark);
+            box-shadow: 0 6px 0 var(--ocean-dark);
         }
-        .btn-check:hover { transform: scale(1.05); background: var(--blue-dark); }
-        .btn-check:active { transform: translateY(3px); box-shadow: none; }
+        .btn-action:hover { background: var(--ocean-dark); transform: scale(1.05); }
+        .btn-action:active { transform: translateY(4px); box-shadow: none; }
 
     </style>
 </head>
 <body>
 
-<div class="area">
-    <ul class="circles">
-        <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
-    </ul>
-</div>
+<div class="background-objects" id="bg-objs"></div>
 
 <div id="login-screen">
     <div class="login-card">
-        <h1 style="color: var(--blue-primary);">Danny's English Hub</h1>
-        <p>Hệ thống bài tập đọc hiểu Homestay</p>
-        <button onclick="login()" class="btn-check" style="font-size: 1rem; padding: 10px 30px;">Tiếp tục với Google 🔑</button>
+        <h1 style="color: var(--ocean-dark); margin-top: 0;">Danny's English Hub</h1>
+        <p style="color: #666;">Đăng nhập để vào bài tập Ocean Quiz</p>
+        <button onclick="startApp()" class="btn-action" style="font-size: 1rem;">Bắt đầu ngay 🌊</button>
     </div>
 </div>
 
 <div class="container" id="quiz-container">
-    <div class="user-bar">
-        <span id="user-welcome">Chào Thủy, chúc bạn học tốt!</span>
-        <button onclick="location.reload()" style="background:none; border:none; color:var(--blue-primary); cursor:pointer; font-weight:bold;">Đăng xuất</button>
-    </div>
-
     <div class="board">
-        <h1 style="text-align: center; color: var(--blue-dark);">Reading: Welcome to London</h1>
-        <div class="reading-text">
-            Dear Giovanna,<br><br>
-            Welcome to The London School of English. We are happy to send you information about your <strong>homestay accommodation</strong>.<br>
-            Your host's name is <strong>Di</strong>. She is a <strong>retired doctor</strong>, and she loves gardening and theater. She lives near the school.<br>
-            Di is a very popular host, and students like talking with her in English.<br>
-            Di has a daughter and 3 grandchildren, but they live in Spain.<br>
+        <h2 style="text-align: center; color: var(--ocean-dark); font-size: 2rem;">Homestay Reading Task</h2>
+        
+        <div class="reading-section">
+            <strong>Dear Giovanna,</strong><br><br>
+            Welcome to The London School of English. We are happy to send you information about your <b>homestay accommodation</b>.<br><br>
+            Your host's name is <b>Di</b>. She is a <b>retired doctor</b>, and she loves gardening and theater. She lives near the school. 
+            Di is a very popular host, and students like talking with her in English.<br><br>
+            Di has a daughter and 3 grandchildren, but they live in Spain. 
             Please write to Di and briefly introduce yourself in English. Please inform her if you have any special needs.<br><br>
             Kind Regards,<br>
-            Betti Sacks - Director
+            <b>Betti Sacks - Director</b>
         </div>
 
-        <div id="quiz-area">
-            <!-- Questions will be injected here -->
-        </div>
+        <div id="quiz-flow"></div>
 
-        <div style="text-align: center; margin-top: 40px;">
-            <button class="btn-check" id="submit-btn" onclick="checkAnswers()">Kiểm tra đáp án 🚀</button>
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn-action" id="check-btn" onclick="checkAnswers()">Kiểm tra đáp án ✅</button>
         </div>
     </div>
 </div>
 
 <script>
-    const questions = [
+    // Tạo hình khối động đậy phía sau
+    const bg = document.getElementById('bg-objs');
+    for (let i = 0; i < 15; i++) {
+        const obj = document.createElement('div');
+        obj.className = 'obj';
+        const size = Math.random() * 80 + 20;
+        obj.style.width = size + 'px';
+        obj.style.height = size + 'px';
+        obj.style.left = Math.random() * 100 + '%';
+        obj.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        obj.style.animationDelay = (Math.random() * 5) + 's';
+        bg.appendChild(obj);
+    }
+
+    const quizData = [
         {
-            q: "\"Homestay accommodation\" means:",
+            q: "\"Homestay accommodation\" means",
             options: ["stay with a host family", "rent a house"],
-            correct: 0,
-            explain: "Homestay là hình thức ở cùng với gia đình bản xứ để trải nghiệm văn hóa."
+            ans: 0,
+            exp: "Homestay là hình thức lưu trú tại nhà người bản xứ."
         },
         {
-            q: "Di is \"a retired doctor\" means:",
+            q: "Di is \"a retired doctor\" means",
             options: ["a doctor that doesn't work anymore", "a very reserved doctor"],
-            correct: 0,
-            explain: "Retired có nghĩa là đã nghỉ hưu, không còn làm việc nữa."
+            ans: 0,
+            exp: "Retired nghĩa là đã nghỉ hưu, không còn công tác."
         },
         {
-            q: "\"Host” describes the person who:",
+            q: "\"Host” describes the person who",
             options: ["receives students as guests", "pays to stay as a guest"],
-            correct: 0,
-            explain: "Host là chủ nhà, người đón tiếp khách (guests)."
+            ans: 0,
+            exp: "Host là chủ nhà, người đón tiếp khách đến ở."
         },
         {
             q: "Di has three children.",
             options: ["True", "False"],
-            correct: 1,
-            explain: "Di chỉ có 1 con gái (a daughter), 3 là số cháu (grandchildren)."
+            ans: 1,
+            exp: "Bà Di chỉ có 1 con gái, 3 là số cháu (grandchildren)."
         },
         {
-            q: "Di's hobbies are:",
+            q: "Di's hobbies are",
             options: ["theatre and gardening", "cooking and gardening"],
-            correct: 0,
-            explain: "Trong thư nói: 'she loves gardening and theater'."
+            ans: 0,
+            exp: "Trong bài có nhắc đến 'gardening and theater'."
         },
         {
-            q: "Di lives:",
+            q: "Di lives",
             options: ["close to the school", "far from the school"],
-            correct: 0,
-            explain: "Trong thư nói: 'She lives near the school' (near = close to)."
+            ans: 0,
+            exp: "Near the school tương đương với close to the school."
         }
     ];
 
-    function login() {
+    function startApp() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('quiz-container').style.display = 'block';
-        renderQuiz();
-    }
-
-    function renderQuiz() {
-        const quizArea = document.getElementById('quiz-area');
-        questions.forEach((item, index) => {
-            const html = `
-                <div class="question-block" id="q-block-${index}">
-                    <p><strong>Question ${index + 1}:</strong> ${item.q}</p>
-                    <div class="options-group">
-                        ${item.options.map((opt, i) => `
-                            <label class="option" id="label-${index}-${i}">
-                                <input type="radio" name="q${index}" value="${i}"> ${opt}
-                            </label>
-                        `).join('')}
-                    </div>
-                    <div class="explanation" id="exp-${index}">${item.explain}</div>
+        const quizFlow = document.getElementById('quiz-flow');
+        quizData.forEach((item, index) => {
+            quizFlow.innerHTML += `
+                <div class="question-box" id="q-box-${index}">
+                    <p><strong>Câu ${index + 1}:</strong> ${item.q}</p>
+                    ${item.options.map((opt, i) => `
+                        <label class="option-label" id="label-${index}-${i}">
+                            <input type="radio" name="q${index}" value="${i}"> ${opt}
+                        </label>
+                    `).join('')}
+                    <div class="explanation" id="exp-${index}">💡 <b>Giải thích:</b> ${item.exp}</div>
                 </div>
             `;
-            quizArea.innerHTML += html;
         });
     }
 
     function checkAnswers() {
         let score = 0;
-        questions.forEach((item, index) => {
+        quizData.forEach((item, index) => {
             const selected = document.querySelector(`input[name="q${index}"]:checked`);
-            const exp = document.getElementById(`exp-${index}`);
-            exp.style.display = 'block';
+            const expBox = document.getElementById(`exp-${index}`);
+            expBox.style.display = 'block';
 
-            questions[index].options.forEach((opt, i) => {
-                const label = document.getElementById(`label-${index}-${i}`);
-                if (i === item.correct) {
-                    label.classList.add('correct-ans');
-                }
+            // Reset labels
+            item.options.forEach((_, i) => {
+                document.getElementById(`label-${index}-${i}`).classList.remove('is-correct', 'is-wrong');
             });
 
             if (selected) {
-                if (parseInt(selected.value) === item.correct) {
+                const userAns = parseInt(selected.value);
+                if (userAns === item.ans) {
                     score++;
+                    document.getElementById(`label-${index}-${userAns}`).classList.add('is-correct');
                 } else {
-                    const wrongLabel = document.getElementById(`label-${index}-${selected.value}`);
-                    wrongLabel.classList.add('wrong-ans');
+                    document.getElementById(`label-${index}-${userAns}`).classList.add('is-wrong');
+                    document.getElementById(`label-${index}-${item.ans}`).classList.add('is-correct');
                 }
+            } else {
+                // Nếu không chọn, vẫn hiện đáp án đúng
+                document.getElementById(`label-${index}-${item.ans}`).classList.add('is-correct');
             }
         });
 
-        if (score === questions.length) {
+        if (score === quizData.length) {
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            alert("Tuyệt vời Thủy ơi! Bạn đúng " + score + "/" + questions.length);
-        } else {
-            alert("Bạn đã hoàn thành bài tập. Hãy xem lại các câu in đỏ nhé!");
         }
-        
-        document.getElementById('submit-btn').style.display = 'none';
+        alert(`Bạn đạt được ${score}/${quizData.length} điểm!`);
+        document.getElementById('check-btn').innerText = "Làm lại bài tập 🔄";
+        document.getElementById('check-btn').onclick = () => location.reload();
     }
 </script>
 </body>
