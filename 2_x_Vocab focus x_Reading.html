@@ -1,1 +1,265 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danny's English Interactive Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #27ae60;
+            --primary-dark: #1e8449;
+            --primary-light: #e8f5e9;
+            --bg: #f4fcf7;
+            --card-bg: #ffffff;
+            --text-main: #2d3436; /* Màu chữ nội dung chính */
+            --text-header: #1b4d3e; /* Màu chữ heading tương phản */
+            --shadow: 0 8px 15px rgba(0,0,0,0.05);
+            --shadow-h: 0 15px 30px rgba(39, 174, 96, 0.15);
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        h1, h2 { color: var(--text-header); }
+
+        /* LOGIN SCREEN */
+        #login-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100vh; text-align: center;
+        }
+        .login-card {
+            background: white; padding: 50px; border-radius: 30px; 
+            box-shadow: var(--shadow); border: 2px solid var(--primary);
+            max-width: 400px; width: 90%;
+        }
+
+        /* USER BAR */
+        .user-bar {
+            position: fixed; top: 15px; right: 20px; display: flex; align-items: center;
+            gap: 15px; background: white; padding: 8px 18px; border-radius: 50px;
+            box-shadow: var(--shadow); z-index: 1000; font-size: 0.9rem;
+            border: 1px solid var(--primary);
+        }
+
+        .container { width: 100%; max-width: 1000px; text-align: center; padding: 20px; display: none; }
+
+        .main-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px; }
+        .menu-card { 
+            background: white; padding: 50px 20px; border-radius: 30px; 
+            box-shadow: var(--shadow); cursor: pointer; transition: all 0.3s ease-out; 
+            border: 2px solid var(--primary-light); 
+        }
+        .menu-card:hover { transform: translateY(-12px); box-shadow: var(--shadow-h); border-color: var(--primary); }
+        .menu-card h2 { font-size: 2.2rem; margin: 0; }
+
+        /* FLASHCARD SECTION */
+        .card-container { perspective: 1200px; width: 100%; height: 450px; margin-bottom: 30px; }
+        .card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card.flipped { transform: rotateY(180deg); }
+        
+        .front, .back { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 50px; border-radius: 40px; box-shadow: var(--shadow); box-sizing: border-box; 
+            background: white; border: 3px solid var(--primary); /* Viền màu xanh nổi bật */
+        }
+        .back { transform: rotateY(180deg); background-color: var(--primary-light); }
+
+        .term-main { font-size: 3.2rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; }
+        .mean-text { font-size: 2.2rem; color: var(--primary); font-style: italic; }
+
+        /* LIST SELECTION */
+        #list-selection { display: none; background: white; padding: 40px; border-radius: 35px; border: 2px solid var(--primary); }
+        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin: 30px 0; }
+        .item-box { 
+            padding: 25px 15px; background: white; border-radius: 15px; cursor: pointer; 
+            font-weight: 600; border: 2px solid var(--primary-light); 
+            transition: all 0.2s ease; color: var(--text-main);
+        }
+        .item-box:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+
+        /* NAV BUTTONS */
+        .btn-mode, .btn-nav { 
+            padding: 12px 25px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; 
+            border: 2px solid var(--primary); background: white; color: var(--primary);
+        }
+        .btn-mode:hover, .btn-nav:hover { background: var(--primary); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h1>Danny's English Hub</h1>
+        <p>Vui lòng đăng nhập để bắt đầu học</p>
+        <button id="login-btn" class="google-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="18">
+            Tiếp tục với Google
+        </button>
+    </div>
+</div>
+
+<div id="user-bar-container" style="display: none;">
+    <div class="user-bar">
+        <span id="user-welcome"></span>
+        <button id="logout-btn" style="border:none; cursor:pointer; color:var(--primary);">Đăng xuất</button>
+    </div>
+</div>
+
+<div class="container" id="main-app-screen">
+    <div id="home-screen">
+        <h1>Lesson: Homestay & Family</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 40px;">Học từ vựng qua câu chuyện của bà Di</p>
+        
+        <div class="main-menu">
+            <div class="menu-card" onclick="toggleModes('vocab')">
+                <h2>Từ vựng mới</h2>
+                <div id="modes-vocab" class="mode-overlay" style="display:none; margin-top:20px; gap:10px; justify-content:center;">
+                    <button class="btn-mode" onclick="start('vocab', 'auto', event)">Học hết</button>
+                    <button class="btn-mode" onclick="start('vocab', 'list', event)">Chọn từ</button>
+                </div>
+            </div>
+            <div class="menu-card" onclick="toggleModes('phrase')">
+                <h2>Mẫu câu giao tiếp</h2>
+                <div id="modes-phrase" class="mode-overlay" style="display:none; margin-top:20px; gap:10px; justify-content:center;">
+                    <button class="btn-mode" onclick="start('phrase', 'auto', event)">Học hết</button>
+                    <button class="btn-mode" onclick="start('phrase', 'list', event)">Chọn câu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="list-selection">
+        <h2>Danh sách bài học</h2>
+        <div id="items-grid" class="grid-items"></div>
+        <button class="btn-mode" onclick="goHome()">Quay lại</button>
+    </div>
+
+    <div id="flashcard-section">
+        <div class="card-container">
+            <div class="card" id="main-card">
+                <div class="front">
+                    <div id="display-term" class="term-main"></div>
+                    <div id="display-mean" class="mean-text"></div>
+                    <div style="font-size: 3rem; cursor:pointer;" onclick="speak(event)">🔊</div>
+                </div>
+                <div class="back">
+                    <div style="font-weight: bold; color: var(--primary-dark); margin-bottom: 10px;">Ví dụ:</div>
+                    <div id="display-ex" style="font-size: 1.8rem; margin-bottom: 15px;"></div>
+                    <div id="display-ex-vi" style="font-style: italic; color: #666;"></div>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex; gap:20px; justify-content:center;">
+            <button class="btn-nav" onclick="prev()">Trước</button>
+            <button class="btn-nav" onclick="flipCard()">Lật thẻ</button>
+            <button class="btn-nav" onclick="next()">Tiếp theo</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById("user-welcome").innerText = "Chào Thủy, " + user.displayName;
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("main-app-screen").style.display = "block";
+            document.getElementById("user-bar-container").style.display = "block";
+        }
+    });
+
+    document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
+    document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
+</script>
+
+<script>
+    const database = {
+        vocab: [
+            { term: "Homestay", mean: "Ở cùng dân bản xứ", ex: "I love staying in a homestay.", vi: "Tôi thích ở cùng gia đình bản xứ." },
+            { term: "Host", mean: "Chủ nhà", ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
+            { term: "Retired", mean: "Đã nghỉ hưu", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+            { term: "Gardening", mean: "Làm vườn", ex: "She loves gardening and theatre.", vi: "Bà ấy yêu làm vườn và xem kịch." },
+            { term: "Grandchildren", mean: "Các cháu", ex: "Di has 3 grandchildren.", vi: "Bà Di có 3 người cháu." }
+        ],
+        phrase: [
+            { term: "Introduce yourself", mean: "Giới thiệu bản thân", ex: "Please briefly introduce yourself.", vi: "Vui lòng giới thiệu ngắn gọn về bản thân." },
+            { term: "Special needs", mean: "Nhu cầu đặc biệt", ex: "Do you have any special needs?", vi: "Bạn có nhu cầu đặc biệt nào không?" },
+            { term: "Write to ___", mean: "Viết thư cho ai", ex: "Please write to Di in English.", vi: "Hãy viết thư cho bà Di bằng tiếng Anh." }
+        ]
+    };
+
+    let curCat = 'vocab', curIdx = 0, curMode = 'auto';
+
+    window.toggleModes = (c) => {
+        curCat = c;
+        document.querySelectorAll('.mode-overlay').forEach(el => el.style.display = 'none');
+        document.getElementById(`modes-${c}`).style.display = 'flex';
+    }
+
+    window.start = (c, m, e) => {
+        e.stopPropagation(); curCat = c; curMode = m;
+        document.getElementById('home-screen').style.display = 'none';
+        m === 'auto' ? (curIdx = 0, showCard()) : showList();
+    }
+
+    function showList() {
+        const grid = document.getElementById('items-grid'); grid.innerHTML = '';
+        database[curCat].forEach((item, i) => {
+            const d = document.createElement('div'); d.className = 'item-box';
+            d.innerHTML = curCat === 'phrase' ? item.term.replace('___', `<span style="color:var(--primary)">[đối tượng]</span>`) : item.term;
+            d.onclick = () => { curIdx = i; showCard(); };
+            grid.appendChild(d);
+        });
+        document.getElementById('list-selection').style.display = 'block';
+        document.getElementById('flashcard-section').style.display = 'none';
+    }
+
+    function showCard() {
+        document.getElementById('list-selection').style.display = 'none';
+        document.getElementById('flashcard-section').style.display = 'block';
+        update();
+    }
+
+    function update() {
+        const item = database[curCat][curIdx];
+        document.getElementById('main-card').classList.remove('flipped');
+        document.getElementById('display-term').textContent = item.term;
+        document.getElementById('display-mean').textContent = item.mean;
+        document.getElementById('display-ex').textContent = item.ex;
+        document.getElementById('display-ex-vi').textContent = item.vi;
+    }
+
+    window.flipCard = () => document.getElementById('main-card').classList.toggle('flipped');
+    window.next = () => { if (curIdx < database[curCat].length - 1) { curIdx++; update(); } else { alert("Hoàn thành bài học!"); goHome(); } }
+    window.prev = () => { if (curIdx > 0) { curIdx--; update(); } }
+    window.goHome = () => { location.reload(); }
+    window.speak = (e) => {
+        e.stopPropagation();
+        const text = document.getElementById('main-card').classList.contains('flipped') ? database[curCat][curIdx].ex : database[curCat][curIdx].term;
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US'; window.speechSynthesis.speak(msg);
+    }
+</script>
+</body>
+</html>
