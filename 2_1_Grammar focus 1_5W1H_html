@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4W1H Interactive Quiz - Brown Aesthetic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8D6E63; /* Màu nâu chủ đạo */
+            --primary-dark: #5D4037;
+            --bg-creme: #EFEBE9; /* Màu nền kem nhạt */
+            --success: #689F38;
+            --error: #D84315;
+            --text: #3E2723;
+            --card-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-creme);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Phông nền trang trí */
+        .decor-circle {
+            position: absolute;
+            background: rgba(141, 110, 99, 0.1);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-40px) rotate(10deg); }
+        }
+
+        /* LOGIN SCREEN */
+        #login-screen { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            width: 100%; height: 100vh; text-align: center; 
+        }
+        .login-card { 
+            background: white; padding: 50px; border-radius: 35px; 
+            box-shadow: 0 15px 35px rgba(62, 39, 35, 0.1); 
+            border: 2px solid var(--primary); max-width: 400px; width: 85%; 
+        }
+
+        /* USER BAR */
+        .user-bar { 
+            position: fixed; top: 15px; right: 20px; display: flex; 
+            align-items: center; gap: 15px; background: white; padding: 8px 18px; 
+            border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            z-index: 1000; border: 1px solid var(--primary); font-size: 0.9rem; 
+        }
+        .btn-logout { background: #EFEBE9; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; color: var(--primary-dark); font-weight: bold; }
+
+        /* QUIZ APP CONTAINER */
+        #quiz-app {
+            display: none; /* Hiện sau khi login */
+            background: var(--card-white);
+            width: 90%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: 35px;
+            box-shadow: 0 25px 60px rgba(62, 39, 35, 0.15);
+            text-align: center;
+            position: relative;
+        }
+
+        #start-screen { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .icon-large { font-size: 80px; margin-bottom: 10px; filter: sepia(0.5); }
+
+        .btn-main {
+            padding: 16px 45px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 0 var(--primary-dark);
+            transition: 0.2s;
+        }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 4px 0 var(--primary-dark); }
+
+        /* PROGRESS BAR */
+        .progress-container { height: 10px; background: #D7CCC8; border-radius: 10px; margin: 25px 0; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0; background: var(--primary); transition: 0.5s; }
+
+        /* QUIZ UI */
+        #quiz-screen, #result-screen { display: none; }
+        h2 { font-size: 1.6rem; margin-bottom: 25px; color: var(--primary-dark); }
+        .options-grid { display: flex; flex-direction: column; gap: 15px; }
+
+        .opt-btn {
+            padding: 20px;
+            border: 2px solid #D7CCC8;
+            border-radius: 20px;
+            background: #FFF;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .opt-btn:hover:not(:disabled) { border-color: var(--primary); background: #FDFBFA; }
+
+        /* Correct/Wrong Colors */
+        .opt-btn.correct-ans { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong-ans { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        /* EXPLANATION BOX */
+        #explanation-box {
+            margin-top: 25px; padding: 20px; background: #EFEBE9;
+            border-radius: 20px; border-left: 6px solid var(--primary);
+            text-align: left; display: none; animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .next-btn { margin-top: 25px; }
+        .score-text { font-size: 4rem; font-weight: 800; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <!-- Trang trí nền -->
+    <div class="decor-circle" style="width:200px; height:200px; top:-50px; left:-50px;"></div>
+    <div class="decor-circle" style="width:150px; height:150px; bottom:20px; right:10px;"></div>
+
+    <!-- Màn hình Đăng nhập -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h1 style="color: var(--primary-dark);">EngHub Practice</h1>
+            <p>Mastering 4W1H Questions</p>
+            <div style="font-size: 50px; margin: 20px 0;">☕</div>
+            <button id="login-btn" class="btn-main" style="font-size: 1rem;">
+                Sign in with Google
+            </button>
+        </div>
+    </div>
+
+    <!-- Thanh thông tin User -->
+    <div id="user-bar-container" style="display: none;">
+        <div class="user-bar">
+            <span id="user-welcome"></span>
+            <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+        </div>
+    </div>
+
+    <!-- Ứng dụng Quiz chính -->
+    <div id="quiz-app">
+        <div id="start-screen">
+            <div class="icon-large">📖</div>
+            <h1>Bản tin 4W1H</h1>
+            <p>Luyện tập cách sử dụng Who, What, When, Why, How <br> hoàn thành các câu hỏi thông dụng.</p>
+            <button class="btn-main" onclick="startQuiz()">Bắt đầu học</button>
+        </div>
+
+        <div id="quiz-screen">
+            <div class="progress-container"><div id="progress-bar"></div></div>
+            <p id="q-counter" style="font-weight: bold; color: var(--primary);">Câu hỏi 1/9</p>
+            <h2 id="question-text">____ do you usually have for breakfast?</h2>
+            <div class="options-grid" id="options-container"></div>
+            
+            <div id="explanation-box">
+                <span id="feedback-label" style="font-weight: bold; font-size: 1.1rem;"></span>
+                <p id="expl-text" style="margin-top: 10px; line-height: 1.5; color: var(--text);"></p>
+            </div>
+
+            <button class="btn-main next-btn" id="next-btn" style="display:none;" onclick="goToNext()">Câu tiếp theo →</button>
+        </div>
+
+        <div id="result-screen">
+            <h1>Kết quả luyện tập</h1>
+            <div class="score-text" id="final-score">0/9</div>
+            <p id="result-msg" style="font-size: 1.2rem; font-weight: 600;"></p>
+            <button class="btn-main" onclick="location.reload()">Làm lại bài</button>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", 
+            authDomain: "nguyen-am-tieng-anh.firebaseapp.com", 
+            projectId: "nguyen-am-tieng-anh" 
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById("user-welcome").innerText = "Chào, " + user.displayName;
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("quiz-app").style.display = "block";
+                document.getElementById("user-bar-container").style.display = "block";
+            }
+        });
+
+        document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
+        document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
+    </script>
+
+    <!-- Quiz Logic -->
+    <script>
+        const questions = [
+            { q: "____ do you usually have for breakfast?", options: ["Who", "What", "Why"], correct: 1, note: "Sử dụng 'What' để hỏi về vật/việc (ăn cái gì cho bữa sáng)." },
+            { q: "____ does the movie start tonight?", options: ["When", "Who", "How"], correct: 0, note: "'When' dùng để hỏi về mốc thời gian sự kiện bắt đầu." },
+            { q: "____ do you go to the gym? (By bus or bike?)", options: ["What", "Why", "How"], correct: 2, note: "'How' dùng để hỏi về phương tiện hoặc cách thức di chuyển." },
+            { q: "____ are you late for the meeting?", options: ["Why", "Who", "What"], correct: 0, note: "'Why' dùng để hỏi về lý do/nguyên nhân." },
+            { q: "____ is your favorite teacher at school?", options: ["Who", "When", "What"], correct: 0, note: "'Who' dùng khi đối tượng là người." },
+            { q: "____ do you feel today?", options: ["What", "How", "When"], correct: 1, note: "'How' dùng để hỏi về trạng thái, sức khỏe hoặc cảm xúc." },
+            { q: "____ is in your backpack?", options: ["Who", "Why", "What"], correct: 2, note: "'What' dùng để hỏi về đồ vật bên trong cặp." },
+            { q: "____ do you visit your grandparents? (Every summer?)", options: ["When", "Who", "What"], correct: 0, note: "'When' dùng để hỏi về tần suất/thời gian thực hiện hành động." },
+            { q: "____ do we need to finish this project? (Because the deadline is tomorrow.)", options: ["How", "Why", "Who"], correct: 1, note: "'Why' là lựa chọn đúng vì câu trả lời cung cấp lý do (deadline)." }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const data = questions[currentIdx];
+            document.getElementById('progress-bar').style.width = `${((currentIdx) / questions.length) * 100}%`;
+            document.getElementById('q-counter').innerText = `Câu hỏi ${currentIdx + 1}/${questions.length}`;
+            document.getElementById('question-text').innerText = data.q;
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            data.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => handleChoice(i, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleChoice(selectedIdx, btn) {
+            const data = questions[currentIdx];
+            const allBtns = document.querySelectorAll('.opt-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selectedIdx === data.correct) {
+                btn.classList.add('correct-ans');
+                score++;
+                document.getElementById('feedback-label').innerText = "Tuyệt vời! ✨";
+                document.getElementById('feedback-label').style.color = "var(--success)";
+            } else {
+                btn.classList.add('wrong-ans');
+                allBtns[data.correct].classList.add('correct-ans');
+                document.getElementById('feedback-label').innerText = "Tiếc quá... ❌";
+                document.getElementById('feedback-label').style.color = "var(--error)";
+            }
+
+            document.getElementById('expl-text').innerText = data.note;
+            document.getElementById('explanation-box').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function goToNext() {
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+            
+            let msg = score > 6 ? "Bạn nắm rất vững các từ để hỏi!" : "Hãy ôn tập thêm một chút về 4W1H nhé!";
+            document.getElementById('result-msg').innerText = msg;
+        }
+    </script>
+</body>
+</html>
