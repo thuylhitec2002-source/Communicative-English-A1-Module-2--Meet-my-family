@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danny's English Interactive Hub</title>
+    <title>Danny's English Interactive Hub - Homestay Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #27ae60;
@@ -12,238 +13,266 @@
             --bg: #f4fcf7;
             --card-bg: #ffffff;
             --text-main: #2d3436;
-            --text-header: #1b4d3e; /* Màu đậm hơn cho tiêu đề */
+            --text-header: #1b4d3e;
+            --success: #27ae60;
+            --error: #e74c3c;
             --shadow: 0 8px 15px rgba(0,0,0,0.05);
             --shadow-h: 0 15px 30px rgba(39, 174, 96, 0.15);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Be Vietnam Pro', sans-serif;
             background-color: var(--bg);
-            margin: 0; padding: 0;
+            margin: 0; padding: 20px;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             color: var(--text-main);
         }
 
-        /* LOGIN & USER BAR */
-        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100vh; text-align: center; }
-        .login-card { background: white; padding: 50px; border-radius: 30px; box-shadow: var(--shadow); border: 2px solid var(--primary); max-width: 400px; width: 90%; }
-        .user-bar { position: fixed; top: 15px; right: 20px; display: flex; align-items: center; gap: 15px; background: white; padding: 8px 18px; border-radius: 50px; box-shadow: var(--shadow); z-index: 1000; border: 1px solid var(--primary); font-size: 0.9rem; }
-        .btn-logout { background: #eee; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; color: #666; font-weight: bold; }
+        .container { width: 100%; max-width: 900px; text-align: center; }
 
-        .container { width: 100%; max-width: 1000px; text-align: center; padding: 20px; display: none; }
+        /* --- SCREEN MANAGEMENT --- */
+        .screen { display: none; animation: fadeIn 0.5s; }
+        .active-screen { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MENU CARDS */
-        .main-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px; }
-        .menu-card { background: white; padding: 50px 20px; border-radius: 30px; box-shadow: var(--shadow); cursor: pointer; transition: all 0.3s ease-out; border: 2px solid var(--primary); }
-        .menu-card:hover { transform: translateY(-12px); box-shadow: var(--shadow-h); }
-        .menu-card h2 { font-size: 2.2rem; color: var(--text-header); margin: 0; }
-        
-        .mode-overlay { display: none; gap: 15px; justify-content: center; margin-top: 25px; animation: fadeIn 0.3s; }
-        .btn-mode { padding: 10px 22px; border: 2px solid var(--primary); background: white; color: var(--primary); border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-mode:hover { background: var(--primary); color: white; }
+        /* --- LOGIN CARD --- */
+        .auth-card { background: white; padding: 50px; border-radius: 35px; box-shadow: var(--shadow-h); max-width: 450px; margin: 0 auto; border: 2px solid var(--primary); }
+        .google-btn { background: white; border: 1px solid #dfe6e9; padding: 12px 25px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: bold; width: 100%; margin-top: 20px; }
+        .google-btn:hover { background: #f8f9fa; transform: translateY(-2px); }
 
-        /* FLASHCARDS */
-        #flashcard-section { display: none; max-width: 700px; margin: 0 auto; }
-        .card-container { perspective: 1200px; width: 100%; height: 450px; margin-bottom: 30px; }
+        /* --- MENU --- */
+        .main-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+        .menu-card { background: white; padding: 40px 20px; border-radius: 25px; box-shadow: var(--shadow); cursor: pointer; transition: 0.3s; border-bottom: 5px solid var(--primary); }
+        .menu-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-h); }
+        .menu-card h2 { color: var(--primary); margin: 0 0 10px; }
+
+        /* --- FLASHCARD --- */
+        .card-container { perspective: 1200px; width: 100%; height: 420px; margin-bottom: 25px; }
         .card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .card.flipped { transform: rotateY(180deg); }
-        
-        .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; border-radius: 40px; box-shadow: var(--shadow); box-sizing: border-box; background: white; border: 3px solid var(--primary); }
+        .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 35px; box-shadow: var(--shadow); background: white; border: 3px solid var(--primary); }
         .back { transform: rotateY(180deg); }
         
-        .card-btn { position: absolute; top: 20px; left: 20px; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; border: 1px solid #ddd; background: #f8f9fa; font-size: 1.6rem; transition: 0.2s; z-index: 100; }
-        .card-btn:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        
-        .speaker-btn-inline { margin-top: 25px; font-size: 3.5rem; cursor: pointer; transition: transform 0.2s; user-select: none; }
-        .term-main { font-size: 3.2rem; font-weight: 800; color: var(--text-header); margin-bottom: 5px; }
+        .card-btn { position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; border: 1px solid #eee; background: #fff; cursor: pointer; font-size: 1.3rem; }
+
+        .term-main { font-size: 2.8rem; font-weight: 800; color: var(--text-header); }
+        .ipa { font-size: 1.4rem; color: #7f8c8d; margin: 10px 0; }
         .mean-text { font-size: 2.2rem; color: var(--primary); font-style: italic; }
+
+        /* --- QUIZ --- */
+        #quiz-section-content { background: white; padding: 50px; border-radius: 35px; box-shadow: var(--shadow); border: 2px solid var(--primary); }
+        .quiz-input { width: 90%; padding: 15px; font-size: 1.8rem; border-radius: 15px; border: 3px solid #eee; text-align: center; outline: none; margin-top: 20px; }
+        .quiz-input.correct { border-color: var(--success); background: #f0fff4; color: var(--success); }
+        .quiz-input.incorrect { border-color: var(--error); background: #fff5f5; color: var(--error); }
+
+        .nav-controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .btn-nav { padding: 14px 35px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; box-shadow: 0 5px 0 var(--primary-dark); }
+        .btn-nav:disabled { background: #bdc3c7; box-shadow: 0 5px 0 #95a5a6; cursor: not-allowed; }
         
-        .ex-label { font-size: 1.1rem; font-weight: bold; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 15px; }
-        .ex-text { font-size: 1.8rem; color: var(--text-main); font-weight: 600; }
-        .ex-vi { font-size: 1.4rem; margin-top: 20px; color: #7f8c8d; font-style: italic; }
+        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 25px; }
+        .item-box { padding: 15px; background: white; border-radius: 12px; border: 1px solid #eee; cursor: pointer; font-weight: 600; }
+        .item-box:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* LIST SELECTION */
-        #list-selection { display: none; background: white; padding: 40px; border-radius: 35px; border: 2px solid var(--primary); }
-        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin: 30px 0; }
-        .item-box { padding: 25px 15px; background: white; border-radius: 15px; cursor: pointer; font-weight: 600; border: 2px solid #eee; border-bottom: 4px solid var(--primary); transition: all 0.2s ease; }
-        .item-box:hover { transform: translateY(-3px); border-color: var(--primary); background: var(--bg); }
-
-        .nav-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
-        .btn-nav { padding: 16px 40px; border: none; border-radius: 20px; font-size: 1.3rem; font-weight: bold; cursor: pointer; background: var(--primary); color: white; box-shadow: 0 6px 0 var(--primary-dark); }
-        .btn-flip-outer { width: 70px; height: 70px; border-radius: 50%; border: none; background: #e3f2fd; color: #448aff; font-size: 1.8rem; cursor: pointer; box-shadow: 0 6px 0 #bbdefb; display: flex; align-items: center; justify-content: center; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+        .shake { animation: shake 0.3s; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-card">
-        <h1 style="color: var(--text-header);">Danny's English Hub</h1>
-        <p>Vui lòng đăng nhập để bắt đầu</p>
-        <button id="login-btn" style="padding:10px 20px; cursor:pointer; border-radius:50px; border:1px solid #ddd; background:white; font-weight:bold;">
-            Tiếp tục với Google
-        </button>
-    </div>
-</div>
-
-<div id="user-bar-container" style="display: none;">
-    <div class="user-bar">
-        <span id="user-welcome"></span>
-        <button id="logout-btn" class="btn-logout">Đăng xuất</button>
-    </div>
-</div>
-
-<div class="container" id="main-app-screen">
-    <div id="home-screen">
-        <h1 style="font-size: 3.2rem; color: var(--text-header);">Lesson: Homestay</h1>
-        <p style="color: #636e72;">Học từ vựng qua câu chuyện của bà Di</p>
-        
-        <div class="main-menu">
-            <div class="menu-card" onclick="toggleModes('vocab')">
-                <h2>Thẻ Từ Vựng</h2>
-                <div id="modes-vocab" class="mode-overlay">
-                    <button class="btn-mode" onclick="start('vocab', 'auto', event)">Thứ tự</button>
-                    <button class="btn-mode" onclick="start('vocab', 'list', event)">Riêng lẻ</button>
-                </div>
-            </div>
-            <div class="menu-card" onclick="toggleModes('phrase')">
-                <h2>Thẻ Mẫu Câu</h2>
-                <div id="modes-phrase" class="mode-overlay">
-                    <button class="btn-mode" onclick="start('phrase', 'auto', event)">Thứ tự</button>
-                    <button class="btn-mode" onclick="start('phrase', 'list', event)">Riêng lẻ</button>
-                </div>
-            </div>
+<div class="container">
+    <div id="login-screen" class="screen active-screen">
+        <div class="auth-card">
+            <h1 style="color: var(--primary);">Danny's Hub</h1>
+            <p>Vui lòng đăng nhập để học bài <b>Homestay</b></p>
+            <button id="login-btn" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa/google.svg" width="18"> Tiếp tục với Google
+            </button>
+            <p id="login-msg"></p>
         </div>
     </div>
 
-    <div id="list-selection">
-        <h2 style="color: var(--text-header);">Chọn nội dung</h2>
-        <div id="items-grid" class="grid-items"></div>
-        <button class="btn-mode" onclick="goHome()">Quay lại Menu</button>
+    <div id="home-screen" class="screen">
+        <h1>Lesson: Homestay</h1>
+        <p id="user-welcome" style="font-weight: bold; color: var(--primary);"></p>
+        <div class="main-menu">
+            <div class="menu-card" onclick="startSection('study')">
+                <h2>Thẻ Từ Vựng</h2>
+                <p>Xem phiên âm & ví dụ</p>
+            </div>
+            <div class="menu-card" onclick="startSection('quiz')">
+                <h2>Kiểm Tra Ghi Nhớ</h2>
+                <p>Gõ tiếng Anh theo nghĩa</p>
+            </div>
+        </div>
+        <button id="logout-btn" style="margin-top:40px; border:none; background:none; color:#95a5a6; cursor:pointer; font-weight:bold;">ĐĂNG XUẤT</button>
     </div>
 
-    <div id="flashcard-section">
+    <div id="list-selection" class="screen">
+        <div style="background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow);">
+            <h2>Danh sách từ vựng</h2>
+            <div id="items-grid" class="grid-items"></div>
+            <button class="btn-nav" style="background:#636e72; box-shadow:0 5px 0 #2d3436; margin-top:20px;" onclick="showScreen('home-screen')">Quay lại</button>
+        </div>
+    </div>
+
+    <div id="flashcard-section" class="screen">
         <div class="card-container">
             <div class="card" id="main-card">
                 <div class="front">
-                    <button class="card-btn" onclick="goBackFromCard(event)">🏠</button>
+                    <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
                     <div id="display-term" class="term-main"></div>
-                    <div id="display-mean" class="mean-text"></div>
-                    <div class="speaker-btn-inline" onclick="speak(event)">🔊</div>
+                    <div id="display-ipa" class="ipa"></div>
+                    <div style="cursor:pointer; font-size: 3rem;" onclick="speakCurrent(event)">🔊</div>
                 </div>
                 <div class="back">
-                    <button class="card-btn" onclick="goBackFromCard(event)">🏠</button>
-                    <div class="ex-label">Đáp án hoàn chỉnh</div>
-                    <div id="display-ex" class="ex-text"></div>
-                    <div id="display-ex-vi" class="ex-vi"></div>
-                    <div class="speaker-btn-inline" onclick="speak(event)">🔊</div>
+                    <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
+                    <div id="display-mean" class="mean-text"></div>
+                    <div id="display-ex" style="margin-top:20px; font-weight:500; color:#555; font-size:1.1rem; padding:0 20px;"></div>
                 </div>
             </div>
         </div>
         <div class="nav-controls">
-            <button class="btn-nav" onclick="prev()" style="background:#636e72; box-shadow:0 6px 0 #2d3436;">Trước</button>
-            <button class="btn-flip-outer" onclick="flipCard()">🔄</button>
+            <button class="btn-nav" style="background:#636e72; box-shadow:0 5px 0 #2d3436;" onclick="prev()">Trước</button>
+            <button style="width:65px; height:65px; border-radius:50%; border:none; background:#e8f5e9; color:var(--primary); font-size:1.5rem; cursor:pointer;" onclick="flipCard()">🔄</button>
             <button class="btn-nav" onclick="next()">Tiếp theo</button>
         </div>
+    </div>
+
+    <div id="quiz-section" class="screen">
+        <div id="quiz-section-content">
+            <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
+            <h3 style="color:#7f8c8d;">Dịch sang tiếng Anh:</h3>
+            <div id="quiz-vn" class="mean-text" style="margin: 20px 0;"></div>
+            <input type="text" id="quiz-input" class="quiz-input" placeholder="Gõ câu trả lời..." autocomplete="off">
+            <div id="quiz-feedback" style="margin-top: 20px; font-weight: bold; height: 30px;"></div>
+            <div class="nav-controls">
+                <button class="btn-nav" id="btn-next-quiz" onclick="nextQuiz()" disabled>Câu tiếp theo (Enter)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="congrats-screen" class="screen">
+        <h1 style="font-size: 3rem; color: var(--success);">Well Done! 🎉</h1>
+        <button class="btn-nav" onclick="showScreen('home-screen')">Luyện tập lại</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", authDomain: "nguyen-am-tieng-anh.firebaseapp.com", projectId: "nguyen-am-tieng-anh" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
+    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            document.getElementById("user-welcome").innerText = "Hi, " + user.displayName;
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-app-screen").style.display = "block";
-            document.getElementById("user-bar-container").style.display = "block";
-        }
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                document.getElementById("user-welcome").innerText = "Chào " + user.displayName + "!";
+                showScreen('home-screen');
+            } else {
+                alert("Email không có quyền truy cập!");
+                await signOut(auth);
+            }
+        } else { showScreen('login-screen'); }
     });
+
     document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
     document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
-</script>
 
-<script>
-    const database = {
-        vocab: [
-            { term: "Homestay accommodation", mean: "Ở cùng dân bản xứ", ex: "We send you information about your homestay accommodation.", vi: "Chúng tôi gửi thông tin về việc ở cùng dân bản xứ cho bạn." },
-            { term: "Host", mean: "Chủ nhà", ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
-            { term: "Retired", mean: "Đã nghỉ hưu", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
-            { term: "Gardening", mean: "Làm vườn", ex: "She loves gardening and theatre.", vi: "Bà ấy yêu làm vườn và kịch nghệ." },
-            { term: "Theatre", mean: "Sân khấu/Kịch", ex: "She enjoys going to the theatre.", vi: "Bà ấy thích đi xem kịch." },
-            { term: "Popular", mean: "Được yêu thích", ex: "English is a popular language.", vi: "Tiếng Anh là một ngôn ngữ phổ biến." },
-            { term: "Grandchildren", mean: "Các cháu", ex: "She has three grandchildren in Spain.", vi: "Bà ấy có 3 người cháu ở Tây Ban Nha." },
-            { term: "Briefly", mean: "Một cách ngắn gọn", ex: "Please briefly introduce yourself.", vi: "Vui lòng giới thiệu ngắn gọn về bản thân." }
-        ],
-        phrase: [
-            { term: "Introduce yourself", mean: "Giới thiệu bản thân", ex: "Write to Di and introduce yourself.", vi: "Viết thư cho bà Di và giới thiệu bản thân." },
-            { term: "Please inform her if ___", mean: "Báo cho cô ấy nếu...", ex: "Please inform her if you have any special needs.", vi: "Báo cho bà ấy nếu bạn có nhu cầu đặc biệt." },
-            { term: "I want to briefly ___", mean: "Tôi muốn... ngắn gọn", ex: "I want to briefly introduce myself to my new host.", vi: "Tôi muốn giới thiệu ngắn gọn với chủ nhà mới." },
-            { term: "She is a retired ___", mean: "Cô ấy là... nghỉ hưu", ex: "She is a retired doctor and loves gardening.", vi: "Bà ấy là bác sĩ nghỉ hưu và yêu làm vườn." },
-            { term: "Special needs", mean: "Nhu cầu đặc biệt", ex: "Inform Di if you have any special needs.", vi: "Báo cho Di nếu bạn có nhu cầu đặc biệt." }
-        ]
-    };
+    const database = [
+        { en: "doctor", ipa: "/ˈdɒk.tər/", vn: "bác sĩ", ex: "She is a retired doctor." },
+        { en: "plant", ipa: "/plɑːnt/", vn: "cây cối / thực vật", ex: "She loves gardening and plants." },
+        { en: "specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "chuyên gia", ex: "Her daughter is a specialist in plants." },
+        { en: "language course", ipa: "/ˈlæŋ.ɡwɪdʒ kɔːs/", vn: "khóa học ngôn ngữ", ex: "I am taking a language course in London." },
+        { en: "Southern Italy", ipa: "/ˈsʌð.ən ˈɪt.əl.i/", vn: "miền Nam nước Ý", ex: "She is from Rome in Southern Italy." },
+        { en: "friendly", ipa: "/ˈfrend.li/", vn: "thân thiện", ex: "She is a quiet but friendly person." },
+        { en: "next month", ipa: "/nekst mʌnθ/", vn: "tháng sau", ex: "I am happy to come to London next month." },
+        { en: "child", ipa: "/tʃaɪld/", vn: "đứa trẻ (số ít)", ex: "She has one child." },
+        { en: "children", ipa: "/ˈtʃɪl.drən/", vn: "trẻ em / con cái (số nhiều)", ex: "She has two children." },
+        { en: "computer", ipa: "/kəmˈpjuː.tər/", vn: "máy tính", ex: "Her son works with computers." },
+        { en: "regularly", ipa: "/ˈreɡ.jə.lə.li/", vn: "thường xuyên", ex: "I see my children regularly." }
+    ];
 
-    let curCat = 'vocab', curIdx = 0, curMode = 'auto';
+    let curIdx = 0;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    window.toggleModes = (c) => {
-        curCat = c;
-        document.querySelectorAll('.mode-overlay').forEach(el => el.style.display = 'none');
-        document.getElementById(`modes-${c}`).style.display = 'flex';
+    window.showScreen = (id) => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(id).classList.add('active-screen');
     }
 
-    window.start = (c, m, e) => {
-        e.stopPropagation(); curCat = c; curMode = m;
-        document.getElementById('home-screen').style.display = 'none';
-        m === 'auto' ? (curIdx = 0, showCard()) : showList();
+    window.startSection = (mode) => {
+        curIdx = 0;
+        if(mode === 'study') {
+            const grid = document.getElementById('items-grid'); grid.innerHTML = '';
+            database.forEach((item, i) => {
+                const d = document.createElement('div'); d.className = 'item-box';
+                d.textContent = item.en; d.onclick = () => { curIdx = i; showCard(); };
+                grid.appendChild(d);
+            });
+            showScreen('list-selection');
+        } else { showScreen('quiz-section'); loadQuiz(); }
     }
 
-    function showList() {
-        const grid = document.getElementById('items-grid'); grid.innerHTML = '';
-        database[curCat].forEach((item, i) => {
-            const d = document.createElement('div'); d.className = 'item-box';
-            d.innerHTML = curCat === 'phrase' && item.term.includes('___') ? 
-                item.term.replace('___', `<span style="color:var(--primary)">[...]</span>`) : item.term;
-            d.onclick = () => { curIdx = i; showCard(); };
-            grid.appendChild(d);
-        });
-        document.getElementById('list-selection').style.display = 'block';
-        document.getElementById('flashcard-section').style.display = 'none';
-    }
-
-    function showCard() {
-        document.getElementById('list-selection').style.display = 'none';
-        document.getElementById('flashcard-section').style.display = 'block';
-        update();
-    }
-
-    function update() {
-        const item = database[curCat][curIdx];
+    function showCard() { showScreen('flashcard-section'); updateCard(); }
+    function updateCard() {
+        const item = database[curIdx];
         document.getElementById('main-card').classList.remove('flipped');
-        document.getElementById('display-term').textContent = item.term;
-        document.getElementById('display-mean').textContent = item.mean;
-        document.getElementById('display-ex').textContent = item.ex;
-        document.getElementById('display-ex-vi').textContent = item.vi;
+        document.getElementById('display-term').textContent = item.en;
+        document.getElementById('display-ipa').textContent = item.ipa;
+        document.getElementById('display-mean').textContent = item.vn;
+        document.getElementById('display-ex').textContent = "Ví dụ: " + item.ex;
     }
 
     window.flipCard = () => document.getElementById('main-card').classList.toggle('flipped');
-    window.next = () => { if (curIdx < database[curCat].length - 1) { curIdx++; update(); } else { alert("Xong!"); goHome(); } }
-    window.prev = () => { if (curIdx > 0) { curIdx--; update(); } }
-    window.goHome = () => { document.getElementById('home-screen').style.display = 'block'; document.getElementById('flashcard-section').style.display = 'none'; document.getElementById('list-selection').style.display = 'none'; }
-    window.goBackFromCard = (e) => { e.stopPropagation(); curMode === 'auto' ? goHome() : showList(); }
-    window.speak = (e) => {
-        e.stopPropagation();
-        const text = document.getElementById('main-card').classList.contains('flipped') ? database[curCat][curIdx].ex : database[curCat][curIdx].term;
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.lang = 'en-US'; window.speechSynthesis.speak(msg);
+    window.next = () => { if(curIdx < database.length - 1) { curIdx++; updateCard(); } else { finish(); } }
+    window.prev = () => { if(curIdx > 0) { curIdx--; updateCard(); } }
+
+    function loadQuiz() {
+        const item = database[curIdx];
+        const input = document.getElementById('quiz-input');
+        document.getElementById('quiz-vn').textContent = item.vn;
+        document.getElementById('quiz-feedback').textContent = '';
+        document.getElementById('btn-next-quiz').disabled = true;
+        input.value = ''; input.className = 'quiz-input'; input.focus();
+    }
+
+    document.getElementById('quiz-input').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            const btnNext = document.getElementById('btn-next-quiz');
+            if(!btnNext.disabled) { nextQuiz(); return; }
+            const val = this.value.trim().toLowerCase();
+            const correct = database[curIdx].en.toLowerCase();
+            if(val === correct) {
+                this.classList.add('correct'); playSysSound('correct');
+                document.getElementById('quiz-feedback').innerHTML = "<span style='color:var(--success)'>Tuyệt vời!</span>";
+                btnNext.disabled = false; speak(correct);
+            } else {
+                this.classList.add('shake', 'incorrect'); playSysSound('wrong');
+                document.getElementById('quiz-feedback').innerHTML = `<span style='color:var(--error)'>Sai rồi! Đáp án: ${correct}</span>`;
+                setTimeout(() => this.classList.remove('shake', 'incorrect'), 400);
+            }
+        }
+    });
+
+    window.nextQuiz = () => { if(curIdx < database.length - 1) { curIdx++; loadQuiz(); } else { finish(); } }
+    function finish() { showScreen('congrats-screen'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); }
+    window.speakCurrent = (e) => { e.stopPropagation(); speak(database[curIdx].en); }
+    function speak(t) { const m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
+
+    function playSysSound(type) {
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        if(type === 'correct') { osc.frequency.setValueAtTime(523, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); }
+        else { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(110, audioCtx.currentTime); }
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
     }
 </script>
 </body>
