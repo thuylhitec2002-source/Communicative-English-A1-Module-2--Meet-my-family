@@ -3,192 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English A1 - Reading Challenge</title>
+    <title>English A1 - Reading Master Gold</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #6366f1; 
-            --primary-hover: #F8F7FF;
-            --success: #10b981; 
-            --error: #ef4444; 
-            --bg: #f0f4f8; 
-            --text-main: #2d3436;
-            --text-sub: #636E72;
+            --primary: #FFB300; /* Vàng đậm */
+            --primary-light: #FFECB3; /* Vàng nhạt */
+            --primary-dark: #FFA000;
+            --success: #2E7D32; 
+            --error: #D84315; 
+            --bg: #FFFDF7; /* Kem vàng nhạt */
+            --text-main: #4E342E;
+            --card-white: #FFFFFF;
         }
         
-        * { box-sizing: border-box; transition: all 0.2s ease; }
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 
         body { 
             font-family: 'Quicksand', sans-serif; 
             background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            color: var(--text-main);
         }
 
-        /* --- LOGIN UI --- */
+        /* --- DECORATION --- */
+        .decor { position: fixed; border-radius: 50%; background: var(--primary-light); opacity: 0.3; z-index: -1; filter: blur(40px); animation: float 8s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(20px, -30px); } }
+
+        /* --- LOGIN SCREEN --- */
         #login-screen {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
         }
 
         .login-card {
-            background: #FFFFFF; padding: 4rem 2rem; border-radius: 2rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center;
-            max-width: 450px; width: 90%; display: flex; flex-direction: column; gap: 2rem; 
+            background: var(--card-white); padding: 3rem; border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(255, 179, 0, 0.15); text-align: center;
+            max-width: 450px; width: 90%; border: 2px solid var(--primary-light);
         }
 
-        .login-header h2 { font-size: 1.8rem; color: var(--primary); margin: 0; }
+        .login-header h2 { font-size: 2rem; color: var(--primary-dark); margin: 10px 0; }
 
         .google-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
-            padding: 0.8rem 1.5rem; border-radius: 50px; cursor: pointer;
-            font-weight: 700; font-size: 1rem; font-family: inherit;
+            background: white; color: var(--text-main); border: 2px solid #EEE;
+            padding: 12px 25px; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1rem; font-family: inherit; margin-top: 20px;
         }
-        .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); }
+        .google-btn:hover { border-color: var(--primary); background: var(--bg); transform: translateY(-3px); }
 
-        /* --- CONTROL BUTTONS --- */
-        .top-controls { position: fixed; top: 20px; left: 20px; z-index: 1000; display: flex; gap: 10px; }
-        .icon-btn {
-            background: white; border: 2px solid var(--primary); color: var(--primary);
-            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        /* --- USER BAR --- */
+        .user-bar { 
+            position: fixed; top: 20px; right: 20px; display: flex; 
+            align-items: center; gap: 15px; background: white; padding: 10px 20px; 
+            border-radius: 50px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            z-index: 1000; border: 1.5px solid var(--primary-light); 
         }
+        .btn-logout { background: var(--primary-light); border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary-dark); }
 
-        /* --- MAIN GAME UI --- */
-        #main-app { display: none; width: 100%; max-width: 700px; flex-direction: column; }
+        /* --- MAIN APP --- */
+        #main-app { display: none; width: 100%; max-width: 750px; flex-direction: column; }
         
         .card { 
-            background: white; padding: 40px; border-radius: 2rem; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; 
+            background: var(--card-white); padding: 45px; border-radius: 40px; 
+            box-shadow: 0 30px 70px rgba(78, 52, 46, 0.08); position: relative; 
         }
 
         .hidden { display: none !important; }
 
-        /* --- TEXT CONTENT AREA --- */
-        .story-container {
-            line-height: 2.2; font-size: 1.15rem; color: #334155; text-align: justify;
-            background: #fdfdfd; padding: 25px; border-radius: 1rem; border: 1px dashed #cbd5e1;
+        /* --- CONTENT UI --- */
+        .story-box {
+            line-height: 2.5; font-size: 1.2rem; text-align: justify;
+            background: #FFFEF9; padding: 30px; border-radius: 25px; 
+            border: 2px solid #FFF8E1; color: #5D4037;
         }
 
         select {
-            display: inline-block; padding: 4px 8px; border-radius: 8px;
-            border: 2px solid #cbd5e1; font-family: 'Quicksand'; font-weight: 700;
-            color: var(--primary); background: white; cursor: pointer;
-            margin: 0 5px; font-size: 1rem;
+            appearance: none; -webkit-appearance: none;
+            padding: 5px 15px; border-radius: 12px; border: 2.5px solid #FFE082;
+            font-family: 'Quicksand'; font-weight: 700; font-size: 1.05rem;
+            color: var(--primary-dark); background: white; cursor: pointer;
+            outline: none; margin: 0 5px; text-align: center;
         }
+        select:hover { border-color: var(--primary); }
 
-        select.correct { border-color: var(--success); background: #f0fdf4; color: #166534; }
-        select.wrong { border-color: var(--error); background: #fef2f2; color: #991b1b; }
+        /* Stats colors for Select */
+        select.correct { border-color: var(--success) !important; background: #E8F5E9; color: var(--success); }
+        select.wrong { border-color: var(--error) !important; background: #FFEBEE; color: var(--error); }
 
+        /* EXPLANATION BOXES */
+        .expl-box {
+            font-size: 0.95rem; line-height: 1.4; color: #795548;
+            margin-top: 5px; padding: 10px 15px; border-radius: 12px;
+            background: #F5F5F5; border-left: 5px solid #BDBDBD;
+            display: none; animation: slideDown 0.3s ease;
+        }
+        .expl-box.show { display: block; }
+        .expl-box.correct-expl { background: #F1F8E9; border-left-color: var(--success); }
+        .expl-box.wrong-expl { background: #FFF3E0; border-left-color: var(--primary); }
+
+        /* BUTTONS */
         .btn-main { 
-            width: 100%; padding: 15px; background: var(--primary); color: white; 
-            border: none; border-radius: 1rem; font-size: 1.1rem; font-weight: 800; 
-            cursor: pointer; margin-top: 25px; text-transform: uppercase;
+            width: 100%; padding: 18px; background: var(--primary); color: white; 
+            border: none; border-radius: 20px; font-size: 1.2rem; font-weight: 800; 
+            cursor: pointer; margin-top: 30px; text-transform: uppercase;
+            box-shadow: 0 6px 0 var(--primary-dark);
         }
+        .btn-main:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--primary-dark); }
+        .btn-main:hover { background: var(--primary-dark); }
 
-        .result-msg { text-align: center; font-weight: 800; margin-top: 20px; font-size: 1.2rem; }
+        .result-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-align: center; }
 
         /* BALLOONS */
         .balloon { position: fixed; bottom: -120px; width: 40px; height: 50px; border-radius: 50%; z-index: 9999; animation: floatUp forwards linear; }
         @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
+    <div class="decor" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
+    <div class="decor" style="width: 200px; height: 200px; bottom: -50px; right: -50px; animation-delay: 2s;"></div>
+
+    <!-- Login -->
     <div id="login-screen">
         <div class="login-card">
+            <div style="font-size: 60px;">🍯</div>
             <div class="login-header">
-                <h2>Welcome Back!</h2>
-                <p>Đăng nhập để làm bài tập tiếng Anh nhé!</p>
+                <h2>English Hub</h2>
+                <p>Cùng ôn tập Reading nào!</p>
             </div>
             <button id="login-btn" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa/google.svg" width="20">
                 Tiếp tục với Google
             </button>
-            <div id="login-msg" style="color:red; font-size: 0.8rem;"></div>
+            <div id="login-msg"></div>
+        </div>
+    </div>
+
+    <!-- User Bar -->
+    <div id="user-bar" class="hidden">
+        <div class="user-bar">
+            <span id="user-welcome"></span>
+            <button class="btn-logout" id="logout-btn">Đăng xuất</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div class="top-controls">
-            <button class="icon-btn" onclick="toggleMusic()" id="music-btn">🔊</button>
-            <button class="icon-btn" id="logout-btn">🚪</button>
-        </div>
-
         <div id="welcome" class="card" style="text-align: center;">
-            <h1 style="color: var(--primary);">READING MASTER</h1>
-            <p id="user-welcome" style="font-weight: 700;"></p>
-            <p>Hoàn thành đoạn văn về Giovanna Russo bằng cách chọn từ đúng.</p>
-            <button class="btn-main" onclick="startGame()">BẮT ĐẦU NGAY 🚀</button>
+            <div style="font-size: 80px; margin-bottom: 20px;">📖</div>
+            <h1 style="color: var(--primary-dark); margin: 0;">READING CHALLENGE</h1>
+            <p style="font-size: 1.1rem; color: var(--text-main); margin: 20px 0;">Giúp Giovanna Russo hoàn thành bức thư nhé!</p>
+            <button class="btn-main" onclick="startGame()">Bắt đầu học ngay 🚀</button>
         </div>
 
         <div id="game" class="card hidden">
-            <div class="story-container">
+            <div class="story-box">
                 1. My name is Giovanna Russo, and I am very 
-                <select class="quiz-item" data-answer="happy">
+                <select class="quiz-item" data-answer="happy" data-note="Học viên chọn 'happy' vì đoạn sau có ý tích cực 'rất vui gặp bạn'.">
                     <option value="">Select answer</option>
                     <option value="sad">sad</option>
                     <option value="happy">happy</option>
                     <option value="sleepy">sleepy</option>
                 </select> 
+                <div class="expl-box"></div>
                 that you are my homestay host during my language 
-                <select class="quiz-item" data-answer="course">
+                <select class="quiz-item" data-answer="course" data-note="'Course' là khóa học ngôn ngữ, phù hợp ngữ cảnh đi học ở London.">
                     <option value="">Select answer</option>
                     <option value="course">course</option>
                     <option value="travel">travel</option>
                     <option value="stay">stay</option>
                 </select> 
+                <div class="expl-box"></div>
                 in London. 
-                <select class="quiz-item" data-answer="Nice">
+                <select class="quiz-item" data-answer="Nice" data-note="Cấu trúc chào hỏi phổ biến: 'Nice to meet you'.">
                     <option value="">Select answer</option>
                     <option value="Good">Good</option>
                     <option value="Well">Well</option>
                     <option value="Nice">Nice</option>
                 </select> 
+                <div class="expl-box"></div>
                 to meet you. I am 56 years 
-                <select class="quiz-item" data-answer="old">
+                <select class="quiz-item" data-answer="old" data-note="Khi nói về tuổi, ta dùng cấu trúc '... years old'.">
                     <option value="">Select answer</option>
                     <option value="age">age</option>
                     <option value="old">old</option>
                     <option value="year">year</option>
                 </select> 
+                <div class="expl-box"></div>
                 and I am from Rome 
-                <select class="quiz-item" data-answer="in">
+                <select class="quiz-item" data-answer="in" data-note="Dùng giới từ 'in' cho các khu vực địa lý lớn (miền Nam nước Ý).">
                     <option value="">Select answer</option>
                     <option value="in">in</option>
                     <option value="on">on</option>
                     <option value="at">at</option>
                 </select> 
+                <div class="expl-box"></div>
                 Southern Italy. I am a <b>doctor</b>. I have 2 children. My son 
-                <select class="quiz-item" data-answer="works">
+                <select class="quiz-item" data-answer="works" data-note="Dùng 'works with' để chỉ công việc liên quan đến máy tính.">
                     <option value="">Select answer</option>
                     <option value="works">works</option>
                     <option value="plays">plays</option>
                     <option value="goes">goes</option>
                 </select> 
+                <div class="expl-box"></div>
                 with computers, and my daughter Sarah is 
-                <select class="quiz-item" data-answer="a">
+                <select class="quiz-item" data-answer="a" data-note="Dùng mạo từ 'a' trước danh từ bắt đầu bằng phụ âm 'specialist'.">
                     <option value="">Select answer</option>
                     <option value="a">a</option>
                     <option value="an">an</option>
                     <option value="the">the</option>
                 </select> 
+                <div class="expl-box"></div>
                 specialist in <b>plants</b>. I see them regularly.
                 <br><br>
                 I am a quiet but friendly person. I am happy to come to London next month.
                 <br><br>
                 Looking 
-                <select class="quiz-item" data-answer="forward">
+                <select class="quiz-item" data-answer="forward" data-note="Cấu trúc: 'Look forward to' có nghĩa là mong đợi điều gì đó.">
                     <option value="">Select answer</option>
                     <option value="after">after</option>
                     <option value="for">for</option>
                     <option value="forward">forward</option>
                 </select> 
+                <div class="expl-box"></div>
                 to meeting you very much.
             </div>
 
-            <div id="result-text" class="result-msg"></div>
-            <button id="btn-submit" class="btn-main" onclick="checkAnswers()">KIỂM TRA ĐÁP ÁN ✅</button>
-            <button id="btn-restart" class="btn-main hidden" onclick="resetGame()">LÀM LẠI 🔄</button>
+            <div id="result-area" style="margin-top: 25px;">
+                <div id="result-title" class="result-title"></div>
+                <button id="btn-submit" class="btn-main" onclick="checkAnswers()">Kiểm tra kết quả ✅</button>
+                <button id="btn-restart" class="btn-main hidden" onclick="location.reload()">Làm lại bài tập 🔄</button>
+            </div>
         </div>
     </div>
 
@@ -200,14 +245,10 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-        // Firebase của bạn
         const firebaseConfig = {
             apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
             authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-            projectId: "nguyen-am-tieng-anh",
-            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-            messagingSenderId: "878440633705",
-            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+            projectId: "nguyen-am-tieng-anh"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -222,9 +263,10 @@
                 if (!snap.empty) {
                     document.getElementById("login-screen").style.display = "none";
                     document.getElementById("main-app").style.display = "flex";
-                    document.getElementById("user-welcome").innerText = "Hi, " + user.displayName + "!";
+                    document.getElementById("user-bar").classList.remove("hidden");
+                    document.getElementById("user-welcome").innerText = "Chào, " + user.displayName;
                 } else {
-                    alert("Email không có trong danh sách học viên!");
+                    alert("Bạn không có quyền truy cập!");
                     await signOut(auth);
                 }
             }
@@ -235,63 +277,75 @@
     </script>
 
     <script>
-        const bgMusic = document.getElementById('bg-music');
-
-        function toggleMusic() {
-            const btn = document.getElementById('music-btn');
-            if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; } 
-            else { bgMusic.pause(); btn.innerText = "🔇"; }
-        }
-
         function startGame() {
             document.getElementById('welcome').classList.add('hidden');
             document.getElementById('game').classList.remove('hidden');
+            document.getElementById('bg-music').play().catch(()=>{});
         }
 
         function checkAnswers() {
             const items = document.querySelectorAll('.quiz-item');
             let score = 0;
-            let filled = true;
+            let allSelected = true;
 
-            items.forEach(item => { if(item.value === "") filled = false; });
-            if(!filled) { alert("Hãy chọn hết các ô trống nhé!"); return; }
+            items.forEach(item => { if(item.value === "") allSelected = false; });
+            if(!allSelected) { alert("Bạn ơi, hãy hoàn thành hết các ô trống nhé!"); return; }
 
             items.forEach(item => {
-                if(item.value === item.getAttribute('data-answer')) {
-                    item.className = "quiz-item correct"; score++;
+                const isCorrect = item.value === item.getAttribute('data-answer');
+                const explBox = item.nextElementSibling;
+                const note = item.getAttribute('data-note');
+                const correctVal = item.getAttribute('data-answer');
+
+                item.disabled = true;
+                explBox.classList.add('show');
+
+                if(isCorrect) {
+                    item.classList.add('correct');
+                    explBox.innerHTML = `<strong>Chính xác!</strong> ✨ <br>${note}`;
+                    explBox.classList.add('correct-expl');
+                    score++;
                 } else {
-                    item.className = "quiz-item wrong";
+                    item.classList.add('wrong');
+                    explBox.innerHTML = `<strong>Chưa đúng...</strong> ❌ <br>Đáp án đúng là: <b>${correctVal}</b>. ${note}`;
+                    explBox.classList.add('wrong-expl');
                 }
             });
 
-            const resText = document.getElementById('result-text');
+            const title = document.getElementById('result-title');
             if(score === items.length) {
-                resText.innerText = "🎉 Tuyệt vời! Bạn đã đúng hết!";
-                resText.style.color = "#10b981";
+                title.innerText = "🌟 XUẤT SẮC! BẠN ĐÃ ĐÚNG 100%";
+                title.style.color = "var(--success)";
                 document.getElementById('snd-correct').play();
                 createBalloons();
             } else {
-                resText.innerText = `Bạn đúng ${score}/${items.length} câu. Thử lại nhé!`;
-                resText.style.color = "#ef4444";
+                title.innerText = `KẾT QUẢ: ${score}/${items.length} CÂU ĐÚNG`;
+                title.style.color = "var(--primary-dark)";
             }
 
             document.getElementById('btn-submit').classList.add('hidden');
             document.getElementById('btn-restart').classList.remove('hidden');
-        }
-
-        function resetGame() {
-            location.reload();
+            document.getElementById('bg-music').pause();
         }
 
         function createBalloons() {
-            for(let i=0; i<30; i++) {
+            const colors = ['#FFB300', '#FFD54F', '#FFF176', '#81C784', '#4FC3F7'];
+            for(let i=0; i<40; i++) {
                 const b = document.createElement('div');
                 b.className = 'balloon';
                 b.style.left = Math.random() * 100 + 'vw';
-                b.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
-                b.style.animationDuration = (2 + Math.random() * 3) + 's';
+                b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                b.style.animationDuration = (3 + Math.random() * 3) + 's';
+                b.style.animationDelay = (Math.random() * 2) + 's';
                 document.body.appendChild(b);
             }
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            const btn = document.getElementById('music-btn');
+            if (audio.paused) { audio.play(); btn.innerText = "🔊"; } 
+            else { audio.pause(); btn.innerText = "🔇"; }
         }
     </script>
 </body>
