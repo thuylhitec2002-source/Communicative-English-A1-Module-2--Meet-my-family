@@ -3,247 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English A1 - Reading Master Gold</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <title>Reading Practice - Giovanna Russo</title>
+    <!-- Sử dụng phông chữ hỗ trợ tiếng Việt tốt nhất -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #FFB300; /* Vàng đậm */
-            --primary-light: #FFECB3; /* Vàng nhạt */
+        :root {
+            --primary: #FFC107;
+            --primary-soft: #FFF8E1;
             --primary-dark: #FFA000;
-            --success: #2E7D32; 
-            --error: #D84315; 
-            --bg: #FFFDF7; /* Kem vàng nhạt */
-            --text-main: #4E342E;
-            --card-white: #FFFFFF;
-        }
-        
-        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        body { 
-            font-family: 'Quicksand', sans-serif; 
-            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
-            color: var(--text-main);
+            --text-dark: #2D3436;
+            --text-light: #636E72;
+            --success: #00B894;
+            --error: #D63031;
+            --bg: #FAFAFA;
         }
 
-        /* --- DECORATION --- */
-        .decor { position: fixed; border-radius: 50%; background: var(--primary-light); opacity: 0.3; z-index: -1; filter: blur(40px); animation: float 8s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(20px, -30px); } }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center;
+        }
 
         /* --- LOGIN SCREEN --- */
         #login-screen {
             position: fixed; inset: 0; background: var(--bg);
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
-
         .login-card {
-            background: var(--card-white); padding: 3rem; border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(255, 179, 0, 0.15); text-align: center;
-            max-width: 450px; width: 90%; border: 2px solid var(--primary-light);
+            background: white; padding: 40px; border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;
+            max-width: 400px; width: 90%;
         }
 
-        .login-header h2 { font-size: 2rem; color: var(--primary-dark); margin: 10px 0; }
-
-        .google-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-            background: white; color: var(--text-main); border: 2px solid #EEE;
-            padding: 12px 25px; border-radius: 100px; cursor: pointer;
-            font-weight: 700; font-size: 1rem; font-family: inherit; margin-top: 20px;
+        /* --- LAYOUT --- */
+        #main-app { display: none; width: 100%; max-width: 800px; }
+        .app-card {
+            background: white; padding: 40px; border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.03); border: 1px solid #F1F1F1;
         }
-        .google-btn:hover { border-color: var(--primary); background: var(--bg); transform: translateY(-3px); }
 
         /* --- USER BAR --- */
-        .user-bar { 
-            position: fixed; top: 20px; right: 20px; display: flex; 
-            align-items: center; gap: 15px; background: white; padding: 10px 20px; 
-            border-radius: 50px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
-            z-index: 1000; border: 1.5px solid var(--primary-light); 
-        }
-        .btn-logout { background: var(--primary-light); border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; color: var(--primary-dark); }
-
-        /* --- MAIN APP --- */
-        #main-app { display: none; width: 100%; max-width: 750px; flex-direction: column; }
-        
-        .card { 
-            background: var(--card-white); padding: 45px; border-radius: 40px; 
-            box-shadow: 0 30px 70px rgba(78, 52, 46, 0.08); position: relative; 
+        .user-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 10px 20px; background: white;
+            border-radius: 15px; border-left: 5px solid var(--primary);
         }
 
-        .hidden { display: none !important; }
-
-        /* --- CONTENT UI --- */
-        .story-box {
-            line-height: 2.5; font-size: 1.2rem; text-align: justify;
-            background: #FFFEF9; padding: 30px; border-radius: 25px; 
-            border: 2px solid #FFF8E1; color: #5D4037;
+        /* --- STORY AREA --- */
+        .story-content {
+            font-size: 1.25rem; line-height: 2.2; text-align: justify;
+            margin-bottom: 30px; color: var(--text-dark);
         }
 
+        /* --- DROPDOWN STYLING --- */
         select {
-            appearance: none; -webkit-appearance: none;
-            padding: 5px 15px; border-radius: 12px; border: 2.5px solid #FFE082;
-            font-family: 'Quicksand'; font-weight: 700; font-size: 1.05rem;
-            color: var(--primary-dark); background: white; cursor: pointer;
-            outline: none; margin: 0 5px; text-align: center;
+            font-family: 'Lexend', sans-serif;
+            font-size: 1.1rem; font-weight: 600;
+            padding: 4px 12px; border-radius: 10px;
+            border: 2px solid #E0E0E0; background: white;
+            color: var(--primary-dark); cursor: pointer;
+            margin: 0 4px; outline: none;
         }
-        select:hover { border-color: var(--primary); }
-
-        /* Stats colors for Select */
-        select.correct { border-color: var(--success) !important; background: #E8F5E9; color: var(--success); }
-        select.wrong { border-color: var(--error) !important; background: #FFEBEE; color: var(--error); }
-
-        /* EXPLANATION BOXES */
-        .expl-box {
-            font-size: 0.95rem; line-height: 1.4; color: #795548;
-            margin-top: 5px; padding: 10px 15px; border-radius: 12px;
-            background: #F5F5F5; border-left: 5px solid #BDBDBD;
-            display: none; animation: slideDown 0.3s ease;
+        /* Hiệu ứng di chuột vào ô chọn */
+        select:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            transform: translateY(-2px);
         }
-        .expl-box.show { display: block; }
-        .expl-box.correct-expl { background: #F1F8E9; border-left-color: var(--success); }
-        .expl-box.wrong-expl { background: #FFF3E0; border-left-color: var(--primary); }
+        select:disabled { cursor: default; opacity: 1; color: inherit; }
+        select.correct { border-color: var(--success); background: #EFFFFB; color: var(--success); }
+        select.wrong { border-color: var(--error); background: #FFF5F5; color: var(--error); }
 
-        /* BUTTONS */
-        .btn-main { 
-            width: 100%; padding: 18px; background: var(--primary); color: white; 
-            border: none; border-radius: 20px; font-size: 1.2rem; font-weight: 800; 
-            cursor: pointer; margin-top: 30px; text-transform: uppercase;
-            box-shadow: 0 6px 0 var(--primary-dark);
+        /* --- EXPLANATION SECTION (Dưới bài) --- */
+        #review-section {
+            margin-top: 30px; padding-top: 20px; border-top: 2px dashed #EEE;
+            display: none;
         }
-        .btn-main:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--primary-dark); }
-        .btn-main:hover { background: var(--primary-dark); }
+        .review-item {
+            margin-bottom: 15px; padding: 15px; border-radius: 12px;
+            background: #F9F9F9; border-left: 4px solid #DDD;
+        }
+        .review-item.is-correct { border-left-color: var(--success); background: #F0FFF4; }
+        .review-item.is-wrong { border-left-color: var(--error); background: #FFF5F5; }
 
-        .result-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; text-align: center; }
+        /* --- BUTTONS --- */
+        .btn-action {
+            width: 100%; padding: 18px; border: none; border-radius: 16px;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            background: var(--primary); color: var(--text-dark);
+            box-shadow: 0 4px 0 var(--primary-dark);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-action:hover {
+            background: var(--primary-dark); transform: translateY(-2px);
+            box-shadow: 0 6px 0 #E68A00;
+        }
+        .btn-action:active { transform: translateY(2px); box-shadow: 0 2px 0 #E68A00; }
+        .btn-outline {
+            background: none; border: 2px solid var(--primary);
+            box-shadow: none; margin-top: 15px;
+        }
 
-        /* BALLOONS */
-        .balloon { position: fixed; bottom: -120px; width: 40px; height: 50px; border-radius: 50%; z-index: 9999; animation: floatUp forwards linear; }
-        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="decor" style="width: 300px; height: 300px; top: -100px; left: -100px;"></div>
-    <div class="decor" style="width: 200px; height: 200px; bottom: -50px; right: -50px; animation-delay: 2s;"></div>
-
-    <!-- Login -->
+    <!-- Màn hình Đăng nhập -->
     <div id="login-screen">
         <div class="login-card">
-            <div style="font-size: 60px;">🍯</div>
-            <div class="login-header">
-                <h2>English Hub</h2>
-                <p>Cùng ôn tập Reading nào!</p>
-            </div>
-            <button id="login-btn" class="google-btn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa/google.svg" width="20">
-                Tiếp tục với Google
-            </button>
-            <div id="login-msg"></div>
-        </div>
-    </div>
-
-    <!-- User Bar -->
-    <div id="user-bar" class="hidden">
-        <div class="user-bar">
-            <span id="user-welcome"></span>
-            <button class="btn-logout" id="logout-btn">Đăng xuất</button>
+            <h2 style="color: var(--primary-dark);">English Practice</h2>
+            <p style="color: var(--text-light);">Vui lòng đăng nhập để bắt đầu bài học.</p>
+            <button id="login-btn" class="btn-action">Tiếp tục với Google</button>
         </div>
     </div>
 
     <div id="main-app">
-        <div id="welcome" class="card" style="text-align: center;">
-            <div style="font-size: 80px; margin-bottom: 20px;">📖</div>
-            <h1 style="color: var(--primary-dark); margin: 0;">READING CHALLENGE</h1>
-            <p style="font-size: 1.1rem; color: var(--text-main); margin: 20px 0;">Giúp Giovanna Russo hoàn thành bức thư nhé!</p>
-            <button class="btn-main" onclick="startGame()">Bắt đầu học ngay 🚀</button>
+        <div class="user-bar">
+            <span id="user-info" style="font-weight: 600;">Chào bạn!</span>
+            <button id="logout-btn" style="background:none; border:none; color:var(--error); cursor:pointer; font-weight:600;">Đăng xuất</button>
         </div>
 
-        <div id="game" class="card hidden">
-            <div class="story-box">
-                1. My name is Giovanna Russo, and I am very 
-                <select class="quiz-item" data-answer="happy" data-note="Học viên chọn 'happy' vì đoạn sau có ý tích cực 'rất vui gặp bạn'.">
-                    <option value="">Select answer</option>
-                    <option value="sad">sad</option>
-                    <option value="happy">happy</option>
-                    <option value="sleepy">sleepy</option>
-                </select> 
-                <div class="expl-box"></div>
-                that you are my homestay host during my language 
-                <select class="quiz-item" data-answer="course" data-note="'Course' là khóa học ngôn ngữ, phù hợp ngữ cảnh đi học ở London.">
-                    <option value="">Select answer</option>
-                    <option value="course">course</option>
-                    <option value="travel">travel</option>
-                    <option value="stay">stay</option>
-                </select> 
-                <div class="expl-box"></div>
-                in London. 
-                <select class="quiz-item" data-answer="Nice" data-note="Cấu trúc chào hỏi phổ biến: 'Nice to meet you'.">
-                    <option value="">Select answer</option>
-                    <option value="Good">Good</option>
-                    <option value="Well">Well</option>
-                    <option value="Nice">Nice</option>
-                </select> 
-                <div class="expl-box"></div>
-                to meet you. I am 56 years 
-                <select class="quiz-item" data-answer="old" data-note="Khi nói về tuổi, ta dùng cấu trúc '... years old'.">
-                    <option value="">Select answer</option>
-                    <option value="age">age</option>
-                    <option value="old">old</option>
-                    <option value="year">year</option>
-                </select> 
-                <div class="expl-box"></div>
-                and I am from Rome 
-                <select class="quiz-item" data-answer="in" data-note="Dùng giới từ 'in' cho các khu vực địa lý lớn (miền Nam nước Ý).">
-                    <option value="">Select answer</option>
-                    <option value="in">in</option>
-                    <option value="on">on</option>
-                    <option value="at">at</option>
-                </select> 
-                <div class="expl-box"></div>
-                Southern Italy. I am a <b>doctor</b>. I have 2 children. My son 
-                <select class="quiz-item" data-answer="works" data-note="Dùng 'works with' để chỉ công việc liên quan đến máy tính.">
-                    <option value="">Select answer</option>
-                    <option value="works">works</option>
-                    <option value="plays">plays</option>
-                    <option value="goes">goes</option>
-                </select> 
-                <div class="expl-box"></div>
-                with computers, and my daughter Sarah is 
-                <select class="quiz-item" data-answer="a" data-note="Dùng mạo từ 'a' trước danh từ bắt đầu bằng phụ âm 'specialist'.">
-                    <option value="">Select answer</option>
-                    <option value="a">a</option>
-                    <option value="an">an</option>
-                    <option value="the">the</option>
-                </select> 
-                <div class="expl-box"></div>
-                specialist in <b>plants</b>. I see them regularly.
-                <br><br>
-                I am a quiet but friendly person. I am happy to come to London next month.
-                <br><br>
-                Looking 
-                <select class="quiz-item" data-answer="forward" data-note="Cấu trúc: 'Look forward to' có nghĩa là mong đợi điều gì đó.">
-                    <option value="">Select answer</option>
-                    <option value="after">after</option>
-                    <option value="for">for</option>
-                    <option value="forward">forward</option>
-                </select> 
-                <div class="expl-box"></div>
-                to meeting you very much.
+        <div class="app-card">
+            <div id="start-view" style="text-align: center;">
+                <h1 style="color: var(--primary-dark);">Reading Master</h1>
+                <p>Hoàn thành bức thư của Giovanna Russo bằng cách chọn từ đúng nhất.</p>
+                <button class="btn-action" onclick="showQuiz()">Bắt đầu ngay 🚀</button>
             </div>
 
-            <div id="result-area" style="margin-top: 25px;">
-                <div id="result-title" class="result-title"></div>
-                <button id="btn-submit" class="btn-main" onclick="checkAnswers()">Kiểm tra kết quả ✅</button>
-                <button id="btn-restart" class="btn-main hidden" onclick="location.reload()">Làm lại bài tập 🔄</button>
+            <div id="quiz-view" class="hidden">
+                <div class="story-content" id="story-text">
+                    My name is Giovanna Russo, and I am very 
+                    <select class="quiz-item" data-answer="happy" data-note="Chúng ta dùng 'happy' vì đoạn văn đang mang ý nghĩa tích cực, thể hiện niềm vui khi được gặp chủ nhà.">
+                        <option value="">...</option>
+                        <option value="sad">sad</option>
+                        <option value="happy">happy</option>
+                        <option value="sleepy">sleepy</option>
+                    </select>
+                    that you are my homestay host during my language 
+                    <select class="quiz-item" data-answer="course" data-note="'Language course' nghĩa là khóa học ngôn ngữ, phù hợp với việc đi học tại London.">
+                        <option value="">...</option>
+                        <option value="course">course</option>
+                        <option value="travel">travel</option>
+                        <option value="stay">stay</option>
+                    </select>
+                    in London. 
+                    <select class="quiz-item" data-answer="Nice" data-note="'Nice to meet you' là lời chào hỏi xã giao phổ biến nhất khi gặp ai đó lần đầu.">
+                        <option value="">...</option>
+                        <option value="Good">Good</option>
+                        <option value="Well">Well</option>
+                        <option value="Nice">Nice</option>
+                    </select>
+                    to meet you. I am 56 years 
+                    <select class="quiz-item" data-answer="old" data-note="Khi nói tuổi trong tiếng Anh, cấu trúc cố định luôn là 'số tuổi + years old'.">
+                        <option value="">...</option>
+                        <option value="age">age</option>
+                        <option value="old">old</option>
+                        <option value="year">year</option>
+                    </select>
+                    and I am from Rome 
+                    <select class="quiz-item" data-answer="in" data-note="Giới từ 'in' dùng cho các thành phố hoặc khu vực địa lý lớn (Southern Italy).">
+                        <option value="">...</option>
+                        <option value="in">in</option>
+                        <option value="on">on</option>
+                        <option value="at">at</option>
+                    </select>
+                    Southern Italy. I am a <b>doctor</b>. I have 2 children. My son 
+                    <select class="quiz-item" data-answer="works" data-note="'Work with' dùng để chỉ công việc liên quan đến một lĩnh vực nào đó (máy tính).">
+                        <option value="">...</option>
+                        <option value="works">works</option>
+                        <option value="plays">plays</option>
+                        <option value="goes">goes</option>
+                    </select>
+                    with computers, and my daughter Sarah is 
+                    <select class="quiz-item" data-answer="a" data-note="Dùng 'a' trước 'specialist' vì từ này bắt đầu bằng một phụ âm.">
+                        <option value="">...</option>
+                        <option value="a">a</option>
+                        <option value="an">an</option>
+                        <option value="the">the</option>
+                    </select>
+                    specialist in <b>plants</b>. I see them regularly.
+                    <br><br>
+                    I am a quiet but friendly person. I am happy to come to London next month.
+                    <br><br>
+                    Looking 
+                    <select class="quiz-item" data-answer="forward" data-note="Cụm từ 'Look forward to' có nghĩa là rất mong chờ, trông đợi điều gì đó sắp xảy ra.">
+                        <option value="">...</option>
+                        <option value="after">after</option>
+                        <option value="for">for</option>
+                        <option value="forward">forward</option>
+                    </select>
+                    to meeting you very much.
+                </div>
+
+                <button id="submit-btn" class="btn-action" onclick="checkAnswers()">Kiểm tra kết quả ✅</button>
+                
+                <!-- Khu vực hiển thị giải thích (Hiện ra sau khi check) -->
+                <div id="review-section">
+                    <h3 style="color: var(--primary-dark);">Chi tiết bài làm:</h3>
+                    <div id="review-list"></div>
+                    <button class="btn-action btn-outline" onclick="location.reload()">Làm lại bài 🔄</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <audio id="bg-music" src="https://cdn.pixabay.com/audio/2025/01/31/audio_210b378eb7.mp3" loop></audio>
-    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
@@ -253,99 +224,70 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth();
-        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    document.getElementById("login-screen").style.display = "none";
-                    document.getElementById("main-app").style.display = "flex";
-                    document.getElementById("user-bar").classList.remove("hidden");
-                    document.getElementById("user-welcome").innerText = "Chào, " + user.displayName;
-                } else {
-                    alert("Bạn không có quyền truy cập!");
-                    await signOut(auth);
-                }
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("main-app").style.display = "block";
+                document.getElementById("user-info").innerText = "Chào, " + user.displayName;
             }
         });
 
         document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
-        document.getElementById("logout-btn").onclick = () => { signOut(auth); location.reload(); };
+        document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
     </script>
 
     <script>
-        function startGame() {
-            document.getElementById('welcome').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
-            document.getElementById('bg-music').play().catch(()=>{});
+        function showQuiz() {
+            document.getElementById('start-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
         }
 
         function checkAnswers() {
             const items = document.querySelectorAll('.quiz-item');
+            let allDone = true;
+            items.forEach(item => { if(item.value === "") allDone = false; });
+            
+            if(!allDone) {
+                alert("Bạn hãy chọn đầy đủ các ô trống trước nhé!");
+                return;
+            }
+
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
             let score = 0;
-            let allSelected = true;
 
-            items.forEach(item => { if(item.value === "") allSelected = false; });
-            if(!allSelected) { alert("Bạn ơi, hãy hoàn thành hết các ô trống nhé!"); return; }
-
-            items.forEach(item => {
-                const isCorrect = item.value === item.getAttribute('data-answer');
-                const explBox = item.nextElementSibling;
-                const note = item.getAttribute('data-note');
+            items.forEach((item, index) => {
+                const userVal = item.value;
                 const correctVal = item.getAttribute('data-answer');
+                const note = item.getAttribute('data-note');
+                const isCorrect = userVal === correctVal;
 
                 item.disabled = true;
-                explBox.classList.add('show');
-
                 if(isCorrect) {
                     item.classList.add('correct');
-                    explBox.innerHTML = `<strong>Chính xác!</strong> ✨ <br>${note}`;
-                    explBox.classList.add('correct-expl');
                     score++;
                 } else {
                     item.classList.add('wrong');
-                    explBox.innerHTML = `<strong>Chưa đúng...</strong> ❌ <br>Đáp án đúng là: <b>${correctVal}</b>. ${note}`;
-                    explBox.classList.add('wrong-expl');
                 }
+
+                // Tạo danh sách giải thích ở dưới
+                const div = document.createElement('div');
+                div.className = `review-item ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+                div.innerHTML = `
+                    <strong>Câu ${index + 1}: ${isCorrect ? 'Chính xác! ✨' : 'Chưa đúng ❌'}</strong><br>
+                    ${!isCorrect ? `Đáp án của bạn: <span style="color:var(--error)">${userVal}</span> | Đáp án đúng: <span style="color:var(--success)">${correctVal}</span><br>` : ''}
+                    <small style="color:var(--text-light)">${note}</small>
+                `;
+                reviewList.appendChild(div);
             });
 
-            const title = document.getElementById('result-title');
-            if(score === items.length) {
-                title.innerText = "🌟 XUẤT SẮC! BẠN ĐÃ ĐÚNG 100%";
-                title.style.color = "var(--success)";
-                document.getElementById('snd-correct').play();
-                createBalloons();
-            } else {
-                title.innerText = `KẾT QUẢ: ${score}/${items.length} CÂU ĐÚNG`;
-                title.style.color = "var(--primary-dark)";
-            }
-
-            document.getElementById('btn-submit').classList.add('hidden');
-            document.getElementById('btn-restart').classList.remove('hidden');
-            document.getElementById('bg-music').pause();
-        }
-
-        function createBalloons() {
-            const colors = ['#FFB300', '#FFD54F', '#FFF176', '#81C784', '#4FC3F7'];
-            for(let i=0; i<40; i++) {
-                const b = document.createElement('div');
-                b.className = 'balloon';
-                b.style.left = Math.random() * 100 + 'vw';
-                b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                b.style.animationDuration = (3 + Math.random() * 3) + 's';
-                b.style.animationDelay = (Math.random() * 2) + 's';
-                document.body.appendChild(b);
-            }
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('bg-music');
-            const btn = document.getElementById('music-btn');
-            if (audio.paused) { audio.play(); btn.innerText = "🔊"; } 
-            else { audio.pause(); btn.innerText = "🔇"; }
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('review-section').style.display = 'block';
+            
+            // Cuộn xuống phần giải thích
+            window.scrollTo({ top: document.getElementById('review-section').offsetTop, behavior: 'smooth' });
         }
     </script>
 </body>
