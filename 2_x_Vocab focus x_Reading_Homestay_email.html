@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danny's English Interactive Hub - Homestay Edition</title>
+    <title>Danny's English Interactive Hub - Homestay & Family</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -35,7 +35,7 @@
         .active-screen { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- LOGIN CARD --- */
+        /* --- AUTH CARD --- */
         .auth-card { background: white; padding: 50px; border-radius: 35px; box-shadow: var(--shadow-h); max-width: 450px; margin: 0 auto; border: 2px solid var(--primary); }
         .google-btn { background: white; border: 1px solid #dfe6e9; padding: 12px 25px; border-radius: 50px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: bold; width: 100%; margin-top: 20px; }
         .google-btn:hover { background: #f8f9fa; transform: translateY(-2px); }
@@ -47,31 +47,31 @@
         .menu-card h2 { color: var(--primary); margin: 0 0 10px; }
 
         /* --- FLASHCARD --- */
-        .card-container { perspective: 1200px; width: 100%; height: 420px; margin-bottom: 25px; }
+        .card-container { perspective: 1200px; width: 100%; height: 450px; margin-bottom: 25px; }
         .card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .card.flipped { transform: rotateY(180deg); }
         .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-radius: 35px; box-shadow: var(--shadow); background: white; border: 3px solid var(--primary); }
         .back { transform: rotateY(180deg); }
         
-        .card-btn { position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; border: 1px solid #eee; background: #fff; cursor: pointer; font-size: 1.3rem; }
+        .card-btn { position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; border: 1px solid #eee; background: #fff; cursor: pointer; font-size: 1.3rem; z-index: 10; }
 
-        .term-main { font-size: 2.8rem; font-weight: 800; color: var(--text-header); }
+        .term-main { font-size: 2.8rem; font-weight: 800; color: var(--text-header); line-height: 1.2; }
         .ipa { font-size: 1.4rem; color: #7f8c8d; margin: 10px 0; }
         .mean-text { font-size: 2.2rem; color: var(--primary); font-style: italic; }
 
         /* --- QUIZ --- */
-        #quiz-section-content { background: white; padding: 50px; border-radius: 35px; box-shadow: var(--shadow); border: 2px solid var(--primary); }
-        .quiz-input { width: 90%; padding: 15px; font-size: 1.8rem; border-radius: 15px; border: 3px solid #eee; text-align: center; outline: none; margin-top: 20px; }
+        #quiz-section-content { background: white; padding: 50px; border-radius: 35px; box-shadow: var(--shadow); border: 2px solid var(--primary); min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .quiz-input { width: 90%; padding: 15px; font-size: 1.8rem; border-radius: 15px; border: 3px solid #eee; text-align: center; outline: none; margin-top: 20px; font-family: inherit; }
         .quiz-input.correct { border-color: var(--success); background: #f0fff4; color: var(--success); }
         .quiz-input.incorrect { border-color: var(--error); background: #fff5f5; color: var(--error); }
 
         .nav-controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .btn-nav { padding: 14px 35px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; box-shadow: 0 5px 0 var(--primary-dark); }
+        .btn-nav { padding: 14px 35px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; box-shadow: 0 5px 0 var(--primary-dark); font-family: inherit; }
         .btn-nav:disabled { background: #bdc3c7; box-shadow: 0 5px 0 #95a5a6; cursor: not-allowed; }
         
         .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 25px; }
-        .item-box { padding: 15px; background: white; border-radius: 12px; border: 1px solid #eee; cursor: pointer; font-weight: 600; }
-        .item-box:hover { border-color: var(--primary); color: var(--primary); }
+        .item-box { padding: 15px; background: white; border-radius: 12px; border: 1px solid #eee; cursor: pointer; font-weight: 600; text-align: center; }
+        .item-box:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
 
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         .shake { animation: shake 0.3s; }
@@ -80,19 +80,21 @@
 <body>
 
 <div class="container">
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
     <div id="login-screen" class="screen active-screen">
         <div class="auth-card">
-            <h1 style="color: var(--primary);">Danny's Hub</h1>
-            <p>Vui lòng đăng nhập để học bài <b>Homestay</b></p>
+            <h1 style="color: var(--primary);">Danny's English Hub</h1>
+            <p>Vui lòng đăng nhập để học bài</p>
             <button id="login-btn" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa/google.svg" width="18"> Tiếp tục với Google
             </button>
-            <p id="login-msg"></p>
+            <p id="login-msg" style="color:var(--error); margin-top:10px;"></p>
         </div>
     </div>
 
+    <!-- MÀN HÌNH CHÍNH -->
     <div id="home-screen" class="screen">
-        <h1>Lesson: Homestay</h1>
+        <h1>Lesson: Homestay & Family</h1>
         <p id="user-welcome" style="font-weight: bold; color: var(--primary);"></p>
         <div class="main-menu">
             <div class="menu-card" onclick="startSection('study')">
@@ -107,14 +109,16 @@
         <button id="logout-btn" style="margin-top:40px; border:none; background:none; color:#95a5a6; cursor:pointer; font-weight:bold;">ĐĂNG XUẤT</button>
     </div>
 
+    <!-- LỰA CHỌN TỪ VỰNG -->
     <div id="list-selection" class="screen">
-        <div style="background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow);">
-            <h2>Danh sách từ vựng</h2>
+        <div style="background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow); border: 2px solid var(--primary);">
+            <h2>Danh sách từ học tập</h2>
             <div id="items-grid" class="grid-items"></div>
             <button class="btn-nav" style="background:#636e72; box-shadow:0 5px 0 #2d3436; margin-top:20px;" onclick="showScreen('home-screen')">Quay lại</button>
         </div>
     </div>
 
+    <!-- MÀN HÌNH FLASHCARD -->
     <div id="flashcard-section" class="screen">
         <div class="card-container">
             <div class="card" id="main-card">
@@ -122,28 +126,31 @@
                     <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
                     <div id="display-term" class="term-main"></div>
                     <div id="display-ipa" class="ipa"></div>
-                    <div style="cursor:pointer; font-size: 3rem;" onclick="speakCurrent(event)">🔊</div>
+                    <div style="cursor:pointer; font-size: 3.5rem;" onclick="speakCurrent(event)">🔊</div>
                 </div>
                 <div class="back">
                     <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
                     <div id="display-mean" class="mean-text"></div>
-                    <div id="display-ex" style="margin-top:20px; font-weight:500; color:#555; font-size:1.1rem; padding:0 20px;"></div>
+                    <div id="display-ex" style="margin-top:20px; font-weight:500; color:#444; font-size:1.15rem; padding:0 20px; line-height:1.6;"></div>
+                    <div id="display-ex-vi" style="margin-top:10px; font-style:italic; color:#7f8c8d; font-size:1rem;"></div>
+                    <div style="cursor:pointer; font-size: 3.5rem; margin-top:15px;" onclick="speakExample(event)">🔊</div>
                 </div>
             </div>
         </div>
         <div class="nav-controls">
             <button class="btn-nav" style="background:#636e72; box-shadow:0 5px 0 #2d3436;" onclick="prev()">Trước</button>
-            <button style="width:65px; height:65px; border-radius:50%; border:none; background:#e8f5e9; color:var(--primary); font-size:1.5rem; cursor:pointer;" onclick="flipCard()">🔄</button>
+            <button style="width:70px; height:70px; border-radius:50%; border:none; background:#e8f5e9; color:var(--primary); font-size:1.8rem; cursor:pointer;" onclick="flipCard()">🔄</button>
             <button class="btn-nav" onclick="next()">Tiếp theo</button>
         </div>
     </div>
 
+    <!-- MÀN HÌNH QUIZ -->
     <div id="quiz-section" class="screen">
         <div id="quiz-section-content">
             <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
-            <h3 style="color:#7f8c8d;">Dịch sang tiếng Anh:</h3>
-            <div id="quiz-vn" class="mean-text" style="margin: 20px 0;"></div>
-            <input type="text" id="quiz-input" class="quiz-input" placeholder="Gõ câu trả lời..." autocomplete="off">
+            <h3 style="color:#7f8c8d; margin-bottom:0;">Viết lại bằng tiếng Anh:</h3>
+            <div id="quiz-vn" class="mean-text" style="margin: 25px 0;"></div>
+            <input type="text" id="quiz-input" class="quiz-input" placeholder="Gõ chính xác..." autocomplete="off">
             <div id="quiz-feedback" style="margin-top: 20px; font-weight: bold; height: 30px;"></div>
             <div class="nav-controls">
                 <button class="btn-nav" id="btn-next-quiz" onclick="nextQuiz()" disabled>Câu tiếp theo (Enter)</button>
@@ -151,9 +158,11 @@
         </div>
     </div>
 
+    <!-- MÀN HÌNH HOÀN THÀNH -->
     <div id="congrats-screen" class="screen">
-        <h1 style="font-size: 3rem; color: var(--success);">Well Done! 🎉</h1>
-        <button class="btn-nav" onclick="showScreen('home-screen')">Luyện tập lại</button>
+        <h1 style="font-size: 3.5rem; color: var(--success);">XUẤT SẮC! 🎉</h1>
+        <p>Bạn đã hoàn thành bài học hôm nay.</p>
+        <button class="btn-nav" onclick="showScreen('home-screen')">Quay lại Menu</button>
     </div>
 </div>
 
@@ -173,10 +182,10 @@
             const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
             const snap = await getDocs(q);
             if (!snap.empty) {
-                document.getElementById("user-welcome").innerText = "Chào " + user.displayName + "!";
+                document.getElementById("user-welcome").innerText = "Chào mừng " + user.displayName + "!";
                 showScreen('home-screen');
             } else {
-                alert("Email không có quyền truy cập!");
+                alert("Email này không có quyền truy cập!");
                 await signOut(auth);
             }
         } else { showScreen('login-screen'); }
@@ -185,18 +194,30 @@
     document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
     document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
 
+    // --- HỢP NHẤT DỮ LIỆU TỪ CẢ 2 BẢN CODE ---
     const database = [
-        { en: "doctor", ipa: "/ˈdɒk.tər/", vn: "bác sĩ", ex: "She is a retired doctor." },
-        { en: "plant", ipa: "/plɑːnt/", vn: "cây cối / thực vật", ex: "She loves gardening and plants." },
-        { en: "specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "chuyên gia", ex: "Her daughter is a specialist in plants." },
-        { en: "language course", ipa: "/ˈlæŋ.ɡwɪdʒ kɔːs/", vn: "khóa học ngôn ngữ", ex: "I am taking a language course in London." },
-        { en: "Southern Italy", ipa: "/ˈsʌð.ən ˈɪt.əl.i/", vn: "miền Nam nước Ý", ex: "She is from Rome in Southern Italy." },
-        { en: "friendly", ipa: "/ˈfrend.li/", vn: "thân thiện", ex: "She is a quiet but friendly person." },
-        { en: "next month", ipa: "/nekst mʌnθ/", vn: "tháng sau", ex: "I am happy to come to London next month." },
-        { en: "child", ipa: "/tʃaɪld/", vn: "đứa trẻ (số ít)", ex: "She has one child." },
-        { en: "children", ipa: "/ˈtʃɪl.drən/", vn: "trẻ em / con cái (số nhiều)", ex: "She has two children." },
-        { en: "computer", ipa: "/kəmˈpjuː.tər/", vn: "máy tính", ex: "Her son works with computers." },
-        { en: "regularly", ipa: "/ˈreɡ.jə.lə.li/", vn: "thường xuyên", ex: "I see my children regularly." }
+        // Nhóm Homestay & Nghề nghiệp
+        { en: "Homestay accommodation", ipa: "/ˈhəʊmsteɪ əˌkɒməˈdeɪʃn/", vn: "Ở cùng dân bản xứ", ex: "We send you information about your homestay accommodation.", vi: "Chúng tôi gửi thông tin về việc ở cùng dân bản xứ cho bạn." },
+        { en: "Host", ipa: "/həʊst/", vn: "Chủ nhà", ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
+        { en: "Retired", ipa: "/rɪˈtaɪəd/", vn: "Đã nghỉ hưu", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Doctor", ipa: "/ˈdɒk.tər/", vn: "Bác sĩ", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Gardening", ipa: "/ˈɡɑːdnɪŋ/", vn: "Làm vườn", ex: "She loves gardening and plants.", vi: "Bà ấy yêu làm vườn và cây cối." },
+        { en: "Plant", ipa: "/plɑːnt/", vn: "Cây cối / Thực vật", ex: "Her daughter is a specialist in plants.", vi: "Con gái bà ấy là chuyên gia về thực vật." },
+        { en: "Specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "Chuyên gia", ex: "She is a specialist in plants.", vi: "Cô ấy là một chuyên gia về cây cối." },
+        { en: "Language course", ipa: "/ˈlæŋɡwɪdʒ kɔːs/", vn: "Khóa học ngôn ngữ", ex: "I am taking a language course in London.", vi: "Tôi đang tham gia một khóa học ngôn ngữ ở London." },
+        { en: "Southern Italy", ipa: "/ˈsʌðən ˈɪtəli/", vn: "Miền Nam nước Ý", ex: "I am from Rome in Southern Italy.", vi: "Tôi đến từ Rome ở miền Nam nước Ý." },
+        { en: "Friendly", ipa: "/ˈfrendli/", vn: "Thân thiện", ex: "She is a quiet but friendly person.", vi: "Bà ấy là một người trầm tính nhưng thân thiện." },
+        { en: "Next month", ipa: "/nekst mʌnθ/", vn: "Tháng sau", ex: "I am coming to London next month.", vi: "Tôi sẽ đến London vào tháng sau." },
+        { en: "Computer", ipa: "/kəmˈpjuːtə(r)/", vn: "Máy tính", ex: "My son works with computers.", vi: "Con trai tôi làm việc với máy tính." },
+        { en: "Regularly", ipa: "/ˈreɡjələli/", vn: "Thường xuyên", ex: "I see them regularly.", vi: "Tôi gặp họ thường xuyên." },
+        { en: "Briefly", ipa: "/ˈbriːfli/", vn: "Ngắn gọn", ex: "Please briefly introduce yourself.", vi: "Hãy giới thiệu ngắn gọn về bản thân." },
+        // Nhóm Gia đình
+        { en: "Grandmother", ipa: "/ˈɡrænmʌðə(r)/", vn: "Bà", ex: "My grandmother is 80 years old.", vi: "Bà của tôi 80 tuổi." },
+        { en: "Grandchildren", ipa: "/ˈɡræn.tʃɪl.drən/", vn: "Các cháu (của ông bà)", ex: "She has three grandchildren in Spain.", vi: "Bà ấy có 3 người cháu ở Tây Ban Nha." },
+        { en: "Son", ipa: "/sʌn/", vn: "Con trai", ex: "My son is a businessman.", vi: "Con trai tôi là một doanh nhân." },
+        { en: "Daughter", ipa: "/ˈdɔːtə(r)/", vn: "Con gái", ex: "My daughter is a teacher.", vi: "Con gái tôi là giáo viên." },
+        { en: "Nephew", ipa: "/ˈnefjuː/", vn: "Cháu trai (con anh chị em)", ex: "My nephew is very cute.", vi: "Cháu trai tôi rất dễ thương." },
+        { en: "Niece", ipa: "/niːs/", vn: "Cháu gái (con anh chị em)", ex: "My niece is a student.", vi: "Cháu gái tôi là một học sinh." }
     ];
 
     let curIdx = 0;
@@ -228,6 +249,7 @@
         document.getElementById('display-ipa').textContent = item.ipa;
         document.getElementById('display-mean').textContent = item.vn;
         document.getElementById('display-ex').textContent = "Ví dụ: " + item.ex;
+        document.getElementById('display-ex-vi').textContent = item.vi;
     }
 
     window.flipCard = () => document.getElementById('main-card').classList.toggle('flipped');
@@ -251,7 +273,7 @@
             const correct = database[curIdx].en.toLowerCase();
             if(val === correct) {
                 this.classList.add('correct'); playSysSound('correct');
-                document.getElementById('quiz-feedback').innerHTML = "<span style='color:var(--success)'>Tuyệt vời!</span>";
+                document.getElementById('quiz-feedback').innerHTML = "<span style='color:var(--success)'>Tuyệt vời! Chính xác.</span>";
                 btnNext.disabled = false; speak(correct);
             } else {
                 this.classList.add('shake', 'incorrect'); playSysSound('wrong');
@@ -264,6 +286,7 @@
     window.nextQuiz = () => { if(curIdx < database.length - 1) { curIdx++; loadQuiz(); } else { finish(); } }
     function finish() { showScreen('congrats-screen'); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); }
     window.speakCurrent = (e) => { e.stopPropagation(); speak(database[curIdx].en); }
+    window.speakExample = (e) => { e.stopPropagation(); speak(database[curIdx].ex); }
     function speak(t) { const m = new SpeechSynthesisUtterance(t); m.lang = 'en-US'; window.speechSynthesis.speak(m); }
 
     function playSysSound(type) {
