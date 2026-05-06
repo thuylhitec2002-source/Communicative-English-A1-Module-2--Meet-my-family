@@ -3,184 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Practice - Giovanna Russo</title>
-    <!-- Sử dụng phông chữ hỗ trợ tiếng Việt tốt nhất -->
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>English A1 Practice - Giovanna Russo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #FFC107;
-            --primary-soft: #FFF8E1;
-            --primary-dark: #FFA000;
-            --text-dark: #2D3436;
-            --text-light: #636E72;
-            --success: #00B894;
-            --error: #D63031;
-            --bg: #FAFAFA;
+            --primary: #FFB300;
+            --primary-dark: #F57C00;
+            --bg: #F9FAFB;
+            --text-main: #1F2937;
+            --text-sub: #6B7280;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --error: #EF4444;
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease; }
+        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 
         body {
-            font-family: 'Lexend', sans-serif;
+            font-family: 'Be Vietnam Pro', sans-serif;
             background-color: var(--bg);
-            color: var(--text-dark);
-            margin: 0; padding: 20px;
-            display: flex; justify-content: center;
+            color: var(--text-main);
+            margin: 0; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
 
         /* --- LOGIN SCREEN --- */
         #login-screen {
             position: fixed; inset: 0; background: var(--bg);
-            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            display: flex; justify-content: center; align-items: center; z-index: 2000;
         }
         .login-card {
-            background: white; padding: 40px; border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center;
-            max-width: 400px; width: 90%;
+            background: var(--white); padding: 3rem; border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            width: 100%; max-width: 480px; text-align: center;
+            border: 1px solid #F3F4F6;
         }
+        .login-card h1 { font-size: 1.75rem; color: var(--primary-dark); margin: 0 0 0.5rem; }
+        .login-card p { color: var(--text-sub); margin-bottom: 2rem; font-size: 1rem; }
 
-        /* --- LAYOUT --- */
-        #main-app { display: none; width: 100%; max-width: 800px; }
-        .app-card {
-            background: white; padding: 40px; border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.03); border: 1px solid #F1F1F1;
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+            background: white; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 0.75rem 1.5rem; border-radius: 0.75rem; cursor: pointer;
+            font-weight: 600; font-size: 0.95rem; width: 100%;
         }
+        .google-btn:hover { border-color: var(--primary); background: #FFFBEB; }
 
-        /* --- USER BAR --- */
+        /* --- MAIN APP --- */
+        #main-app { display: none; width: 90%; max-width: 800px; padding: 2rem 0; }
+        .app-card { background: var(--white); border-radius: 2rem; padding: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+
         .user-bar {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding: 10px 20px; background: white;
-            border-radius: 15px; border-left: 5px solid var(--primary);
+            margin-bottom: 1.5rem; padding: 0.75rem 1.5rem; background: #FFFBEB;
+            border-radius: 1rem; border: 1px solid #FEF3C7;
         }
 
-        /* --- STORY AREA --- */
-        .story-content {
-            font-size: 1.25rem; line-height: 2.2; text-align: justify;
-            margin-bottom: 30px; color: var(--text-dark);
+        /* --- CONTENT --- */
+        .story-text {
+            font-size: 1.2rem; line-height: 2.2; text-align: justify; color: #374151;
         }
 
-        /* --- DROPDOWN STYLING --- */
         select {
-            font-family: 'Lexend', sans-serif;
-            font-size: 1.1rem; font-weight: 600;
-            padding: 4px 12px; border-radius: 10px;
-            border: 2px solid #E0E0E0; background: white;
-            color: var(--primary-dark); cursor: pointer;
-            margin: 0 4px; outline: none;
+            padding: 4px 10px; border-radius: 0.5rem; border: 2px solid #E5E7EB;
+            font-family: inherit; font-size: 1.05rem; font-weight: 600;
+            color: var(--primary-dark); cursor: pointer; outline: none; background: #FDFDFD;
         }
-        /* Hiệu ứng di chuột vào ô chọn */
-        select:hover:not(:disabled) {
-            border-color: var(--primary);
-            background: var(--primary-soft);
-            transform: translateY(-2px);
-        }
-        select:disabled { cursor: default; opacity: 1; color: inherit; }
-        select.correct { border-color: var(--success); background: #EFFFFB; color: var(--success); }
-        select.wrong { border-color: var(--error); background: #FFF5F5; color: var(--error); }
+        select:hover { border-color: var(--primary); transform: translateY(-1px); }
+        select.correct { border-color: var(--success); background: #ECFDF5; color: var(--success); }
+        select.wrong { border-color: var(--error); background: #FEF2F2; color: var(--error); }
 
-        /* --- EXPLANATION SECTION (Dưới bài) --- */
-        #review-section {
-            margin-top: 30px; padding-top: 20px; border-top: 2px dashed #EEE;
-            display: none;
+        /* --- ACTION BUTTONS --- */
+        .btn-main {
+            width: 100%; padding: 1.25rem; background: var(--primary); color: var(--white);
+            border: none; border-radius: 1rem; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; margin-top: 2rem; box-shadow: 0 4px 0 var(--primary-dark);
         }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0; }
+        .btn-main:hover { background: var(--primary-dark); }
+
+        /* --- REVIEW LIST --- */
+        #review-section { margin-top: 3rem; border-top: 1px solid #F3F4F6; padding-top: 2rem; }
         .review-item {
-            margin-bottom: 15px; padding: 15px; border-radius: 12px;
-            background: #F9F9F9; border-left: 4px solid #DDD;
+            padding: 1rem; border-radius: 1rem; margin-bottom: 1rem;
+            background: #F9FAFB; border-left: 4px solid #D1D5DB;
         }
-        .review-item.is-correct { border-left-color: var(--success); background: #F0FFF4; }
-        .review-item.is-wrong { border-left-color: var(--error); background: #FFF5F5; }
+        .review-item.correct-item { border-left-color: var(--success); background: #F0FDF4; }
+        .review-item.wrong-item { border-left-color: var(--error); background: #FEF2F2; }
 
-        /* --- BUTTONS --- */
-        .btn-action {
-            width: 100%; padding: 18px; border: none; border-radius: 16px;
-            font-size: 1.1rem; font-weight: 700; cursor: pointer;
-            background: var(--primary); color: var(--text-dark);
-            box-shadow: 0 4px 0 var(--primary-dark);
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .btn-action:hover {
-            background: var(--primary-dark); transform: translateY(-2px);
-            box-shadow: 0 6px 0 #E68A00;
-        }
-        .btn-action:active { transform: translateY(2px); box-shadow: 0 2px 0 #E68A00; }
-        .btn-outline {
-            background: none; border: 2px solid var(--primary);
-            box-shadow: none; margin-top: 15px;
-        }
-
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- Màn hình Đăng nhập -->
     <div id="login-screen">
         <div class="login-card">
-            <h2 style="color: var(--primary-dark);">English Practice</h2>
-            <p style="color: var(--text-light);">Vui lòng đăng nhập để bắt đầu bài học.</p>
-            <button id="login-btn" class="btn-action">Tiếp tục với Google</button>
+            <h1>English Practice</h1>
+            <p>Dành cho học viên trình độ A1</p>
+            <button id="login-btn" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/pwa/google.svg" width="18">
+                Tiếp tục với Google
+            </button>
+            <div id="login-msg" style="color:var(--error); margin-top:10px; font-size:0.85rem;"></div>
         </div>
     </div>
 
     <div id="main-app">
         <div class="user-bar">
-            <span id="user-info" style="font-weight: 600;">Chào bạn!</span>
-            <button id="logout-btn" style="background:none; border:none; color:var(--error); cursor:pointer; font-weight:600;">Đăng xuất</button>
+            <span id="user-display" style="font-weight:600; font-size:0.9rem;"></span>
+            <button id="logout-btn" style="background:none; border:none; color:var(--text-sub); cursor:pointer; font-weight:600;">Đăng xuất</button>
         </div>
 
         <div class="app-card">
-            <div id="start-view" style="text-align: center;">
-                <h1 style="color: var(--primary-dark);">Reading Master</h1>
-                <p>Hoàn thành bức thư của Giovanna Russo bằng cách chọn từ đúng nhất.</p>
-                <button class="btn-action" onclick="showQuiz()">Bắt đầu ngay 🚀</button>
-            </div>
-
-            <div id="quiz-view" class="hidden">
-                <div class="story-content" id="story-text">
+            <div id="quiz-view">
+                <div class="story-text">
                     My name is Giovanna Russo, and I am very 
-                    <select class="quiz-item" data-answer="happy" data-note="Chúng ta dùng 'happy' vì đoạn văn đang mang ý nghĩa tích cực, thể hiện niềm vui khi được gặp chủ nhà.">
+                    <select class="quiz-item" data-answer="happy" data-note="Chọn 'happy' vì đây là lời chào thân thiện trong thư.">
                         <option value="">...</option>
                         <option value="sad">sad</option>
                         <option value="happy">happy</option>
                         <option value="sleepy">sleepy</option>
                     </select>
                     that you are my homestay host during my language 
-                    <select class="quiz-item" data-answer="course" data-note="'Language course' nghĩa là khóa học ngôn ngữ, phù hợp với việc đi học tại London.">
+                    <select class="quiz-item" data-answer="course" data-note="'Language course' có nghĩa là khóa học ngôn ngữ.">
                         <option value="">...</option>
                         <option value="course">course</option>
                         <option value="travel">travel</option>
                         <option value="stay">stay</option>
                     </select>
                     in London. 
-                    <select class="quiz-item" data-answer="Nice" data-note="'Nice to meet you' là lời chào hỏi xã giao phổ biến nhất khi gặp ai đó lần đầu.">
+                    <select class="quiz-item" data-answer="Nice" data-note="Cụm từ chuẩn: 'Nice to meet you'.">
                         <option value="">...</option>
                         <option value="Good">Good</option>
                         <option value="Well">Well</option>
                         <option value="Nice">Nice</option>
                     </select>
                     to meet you. I am 56 years 
-                    <select class="quiz-item" data-answer="old" data-note="Khi nói tuổi trong tiếng Anh, cấu trúc cố định luôn là 'số tuổi + years old'.">
+                    <select class="quiz-item" data-answer="old" data-note="Khi nói tuổi dùng cấu trúc 'years old'.">
                         <option value="">...</option>
                         <option value="age">age</option>
                         <option value="old">old</option>
                         <option value="year">year</option>
                     </select>
                     and I am from Rome 
-                    <select class="quiz-item" data-answer="in" data-note="Giới từ 'in' dùng cho các thành phố hoặc khu vực địa lý lớn (Southern Italy).">
+                    <select class="quiz-item" data-answer="in" data-note="Giới từ 'in' dùng cho thành phố/khu vực lớn.">
                         <option value="">...</option>
                         <option value="in">in</option>
                         <option value="on">on</option>
                         <option value="at">at</option>
                     </select>
                     Southern Italy. I am a <b>doctor</b>. I have 2 children. My son 
-                    <select class="quiz-item" data-answer="works" data-note="'Work with' dùng để chỉ công việc liên quan đến một lĩnh vực nào đó (máy tính).">
+                    <select class="quiz-item" data-answer="works" data-note="'Works with' máy tính chỉ tính chất công việc.">
                         <option value="">...</option>
                         <option value="works">works</option>
                         <option value="plays">plays</option>
                         <option value="goes">goes</option>
                     </select>
                     with computers, and my daughter Sarah is 
-                    <select class="quiz-item" data-answer="a" data-note="Dùng 'a' trước 'specialist' vì từ này bắt đầu bằng một phụ âm.">
+                    <select class="quiz-item" data-answer="a" data-note="Dùng 'a' vì 'specialist' bắt đầu bằng phụ âm.">
                         <option value="">...</option>
                         <option value="a">a</option>
                         <option value="an">an</option>
@@ -191,7 +171,7 @@
                     I am a quiet but friendly person. I am happy to come to London next month.
                     <br><br>
                     Looking 
-                    <select class="quiz-item" data-answer="forward" data-note="Cụm từ 'Look forward to' có nghĩa là rất mong chờ, trông đợi điều gì đó sắp xảy ra.">
+                    <select class="quiz-item" data-answer="forward" data-note="'Look forward to' là cụm từ rất mong chờ điều gì.">
                         <option value="">...</option>
                         <option value="after">after</option>
                         <option value="for">for</option>
@@ -199,15 +179,13 @@
                     </select>
                     to meeting you very much.
                 </div>
+                <button id="submit-btn" class="btn-main" onclick="checkAnswers()">KIỂM TRA ĐÁP ÁN ✅</button>
+            </div>
 
-                <button id="submit-btn" class="btn-action" onclick="checkAnswers()">Kiểm tra kết quả ✅</button>
-                
-                <!-- Khu vực hiển thị giải thích (Hiện ra sau khi check) -->
-                <div id="review-section">
-                    <h3 style="color: var(--primary-dark);">Chi tiết bài làm:</h3>
-                    <div id="review-list"></div>
-                    <button class="btn-action btn-outline" onclick="location.reload()">Làm lại bài 🔄</button>
-                </div>
+            <div id="review-section" class="hidden">
+                <h2 style="font-size: 1.25rem; margin-bottom: 1.5rem;">Giải thích chi tiết bài làm:</h2>
+                <div id="review-list"></div>
+                <button class="btn-main" style="background:#6B7280; box-shadow: 0 4px 0 #4B5563;" onclick="location.reload()">LÀM LẠI BÀI 🔄</button>
             </div>
         </div>
     </div>
@@ -215,79 +193,67 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", 
             authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
             projectId: "nguyen-am-tieng-anh"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth();
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                document.getElementById("login-screen").classList.add("hidden");
-                document.getElementById("main-app").style.display = "block";
-                document.getElementById("user-info").innerText = "Chào, " + user.displayName;
+                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    document.getElementById("login-screen").classList.add("hidden");
+                    document.getElementById("main-app").style.display = "block";
+                    document.getElementById("user-display").innerText = user.displayName;
+                } else {
+                    document.getElementById("login-msg").innerText = "Email không có trong danh sách!";
+                    await signOut(auth);
+                }
             }
         });
 
-        document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
+        document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider).catch(() => {});
         document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
     </script>
 
     <script>
-        function showQuiz() {
-            document.getElementById('start-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-        }
-
         function checkAnswers() {
             const items = document.querySelectorAll('.quiz-item');
-            let allDone = true;
-            items.forEach(item => { if(item.value === "") allDone = false; });
-            
-            if(!allDone) {
-                alert("Bạn hãy chọn đầy đủ các ô trống trước nhé!");
-                return;
-            }
-
-            const reviewList = document.getElementById('review-list');
-            reviewList.innerHTML = '';
             let score = 0;
+            let incomplete = false;
+            items.forEach(i => { if(i.value === "") incomplete = true; });
+            if(incomplete) { alert("Vui lòng hoàn thành các ô trống!"); return; }
 
-            items.forEach((item, index) => {
-                const userVal = item.value;
-                const correctVal = item.getAttribute('data-answer');
-                const note = item.getAttribute('data-note');
-                const isCorrect = userVal === correctVal;
+            const list = document.getElementById('review-list');
+            list.innerHTML = '';
 
+            items.forEach((item, idx) => {
+                const correct = item.getAttribute('data-answer');
+                const isRight = item.value === correct;
                 item.disabled = true;
-                if(isCorrect) {
-                    item.classList.add('correct');
-                    score++;
-                } else {
-                    item.classList.add('wrong');
-                }
+                item.className = isRight ? 'quiz-item correct' : 'quiz-item wrong';
+                if(isRight) score++;
 
-                // Tạo danh sách giải thích ở dưới
                 const div = document.createElement('div');
-                div.className = `review-item ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+                div.className = `review-item ${isRight ? 'correct-item' : 'wrong-item'}`;
                 div.innerHTML = `
-                    <strong>Câu ${index + 1}: ${isCorrect ? 'Chính xác! ✨' : 'Chưa đúng ❌'}</strong><br>
-                    ${!isCorrect ? `Đáp án của bạn: <span style="color:var(--error)">${userVal}</span> | Đáp án đúng: <span style="color:var(--success)">${correctVal}</span><br>` : ''}
-                    <small style="color:var(--text-light)">${note}</small>
+                    <div style="font-weight:700; margin-bottom:4px;">Câu ${idx+1}: ${isRight ? 'Đúng' : 'Sai'}</div>
+                    <div style="font-size:0.9rem;">${!isRight ? `Bạn chọn: <del>${item.value}</del> | Đáp án: <b>${correct}</b><br>` : ''}${item.getAttribute('data-note')}</div>
                 `;
-                reviewList.appendChild(div);
+                list.appendChild(div);
             });
 
             document.getElementById('submit-btn').classList.add('hidden');
-            document.getElementById('review-section').style.display = 'block';
-            
-            // Cuộn xuống phần giải thích
-            window.scrollTo({ top: document.getElementById('review-section').offsetTop, behavior: 'smooth' });
+            document.getElementById('review-section').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('review-section').offsetTop - 50, behavior: 'smooth' });
         }
     </script>
 </body>
