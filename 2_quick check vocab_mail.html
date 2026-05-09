@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Vocab Quiz - Interactive Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --primary-hover: #5B4BC4;
+            --secondary: #A29BFE;
+            --bg: #F0F3F7;
+            --card-bg: #FFFFFF;
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --success: #00B894;
+            --error: #D63031;
+            --accent: #0984E3;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: radial-gradient(circle at top left, #e0e5ec, #f0f3f7);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Login Screen --- */
+        #login-screen {
+            position: fixed; inset: 0;
+            background: var(--bg);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 3.5rem 2.5rem;
+            border-radius: 2rem;
+            box-shadow: 20px 20px 60px #d1d9e6, -20px -20px 60px #ffffff;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .google-btn {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; padding: 1rem; border-radius: 1rem;
+            border: 2px solid #eee; background: white;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+
+        .google-btn:hover {
+            border-color: var(--primary);
+            background: #f8faff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.15);
+        }
+
+        /* --- Main Layout --- */
+        #main-content { display: none; width: 100%; max-width: 600px; padding: 20px; }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: 2.5rem;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.5s ease-out;
+            position: relative;
+        }
+
+        /* --- Music Control --- */
+        .music-toggle {
+            position: fixed; top: 25px; right: 25px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background: white; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; z-index: 100;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            height: 10px; background: #edf2f7; border-radius: 20px;
+            margin: 25px 0; overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- Question Area --- */
+        .question-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
+        .word-highlight { color: var(--primary); background: #f0eeff; padding: 2px 10px; border-radius: 8px; }
+
+        /* --- 4 Options Grid --- */
+        .options-grid {
+            display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px;
+        }
+
+        .opt-btn {
+            padding: 20px; border: 2px solid #f1f3f5; border-radius: 1.2rem;
+            background: white; cursor: pointer; font-family: inherit;
+            font-size: 1.05rem; font-weight: 600; text-align: left;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #fcfbff;
+            transform: translateX(10px);
+        }
+
+        .opt-btn:active { transform: scale(0.98); }
+
+        .opt-btn.correct { background: #d1fae5; border-color: var(--success); color: #065f46; }
+        .opt-btn.wrong { background: #fee2e2; border-color: var(--error); color: #991b1b; }
+
+        /* --- Navigation --- */
+        .nav-footer { display: flex; gap: 15px; margin-top: 20px; }
+        .btn-main {
+            flex: 1; padding: 16px; border-radius: 1rem; border: none;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .btn-next { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3); }
+        .btn-next:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; }
+        .btn-next:hover:not(:disabled) { background: var(--primary-hover); }
+
+        .translation-box {
+            background: #f8f9fa; border-left: 5px solid var(--accent);
+            padding: 15px; border-radius: 0 12px 12px 0; margin-bottom: 20px;
+            display: none; animation: fadeInUp 0.4s ease;
+        }
+
+        #result-screen { display: none; text-align: center; }
+        .score-circle {
+            width: 150px; height: 150px; border-radius: 50%; border: 8px solid var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 700; margin: 0 auto 30px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<button class="music-toggle" onclick="toggleMusic()">🔇</button>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h2>Chào mừng bạn!</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Vui lòng đăng nhập để bắt đầu học tập cùng hệ thống</p>
+        <button id="login-btn" class="google-btn">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            Tiếp tục với Google
+        </button>
+        <div id="login-msg" style="margin-top: 15px; color: var(--error); font-size: 0.9rem;"></div>
+    </div>
+</div>
+
+<main id="main-content">
+    <div id="quiz-container" class="quiz-card">
+        <!-- Start Screen -->
+        <div id="start-screen" style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🚀</div>
+            <h1>Vocabulary Master</h1>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Chinh phục 20 từ vựng tiếng Anh giao tiếp thông dụng ngay bây giờ!</p>
+            <button class="btn-main btn-next" onclick="startQuiz()">BẮT ĐẦU HỌC</button>
+        </div>
+
+        <!-- Quiz Content -->
+        <div id="quiz-content" style="display: none;">
+            <div class="progress-container"><div id="progress-fill"></div></div>
+            <div id="q-count" style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 10px;"></div>
+            <div id="question-text" class="question-title"></div>
+            
+            <div id="translation-box" class="translation-box"></div>
+
+            <div id="options-container" class="options-grid"></div>
+
+            <div class="nav-footer">
+                <button id="next-btn" class="btn-main btn-next" onclick="nextQuestion()" disabled>Tiếp theo</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen">
+            <h2>Kết quả của bạn</h2>
+            <div class="score-circle" id="score-text">0/0</div>
+            <p id="result-msg" style="margin-bottom: 30px; font-weight: 600;"></p>
+            <button class="btn-main btn-next" onclick="location.reload()">Học lại từ đầu</button>
+        </div>
+    </div>
+</main>
+
+<audio id="bg-music" loop src="https://vnso-pt-7-tf-a128-z3.zmdcdn.me/25de35937e1e650b577265725f162e6f?authen=exp=1774627563~acl=/25de35937e1e650b577265725f162e6f*~hmac=37d9728c9b8d4c33f4bef14a8d69ef2c"></audio>
+<audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1"></audio>
+<audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_8b0fae46ef.mp3"></audio>
+
+<script type="module">
+    // --- FIREBASE LOGIC (Giữ nguyên cấu trúc của bạn) ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { checkUserPermission(user.email); } 
+        else {
+            document.getElementById("login-screen").style.display = "flex";
+            document.getElementById("main-content").style.display = "none";
+        }
+    });
+
+    async function checkUserPermission(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+        } else {
+            document.getElementById("login-msg").innerText = "Email không có quyền truy cập!";
+            signOut(auth);
+        }
+    }
+
+    document.getElementById("login-btn").onclick = async () => {
+        try { await signInWithPopup(auth, provider); } 
+        catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
+    };
+</script>
+
+<script>
+    // Dữ liệu từ vựng gốc
+    const vocabData = [
+        { en: "Homestay accommodation", ipa: "/ˈhəʊmsteɪ əˌkɒməˈdeɪʃn/", vn: "Ở cùng dân bản xứ", ex: "We send you information about your homestay accommodation.", vi: "Chúng tôi gửi thông tin về việc ở cùng dân bản xứ cho bạn." },
+        { en: "Host", ipa: "/həʊst/", vn: "Chủ nhà", ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
+        { en: "Retired", ipa: "/rɪˈtaɪəd/", vn: "Đã nghỉ hưu", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Doctor", ipa: "/ˈdɒk.tər/", vn: "Bác sĩ", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Gardening", ipa: "/ˈɡɑːdnɪŋ/", vn: "Làm vườn", ex: "She loves gardening and plants.", vi: "Bà ấy yêu làm vườn và cây cối." },
+        { en: "Plant", ipa: "/plɑːnt/", vn: "Cây cối / Thực vật", ex: "Her daughter is a specialist in plants.", vi: "Con gái bà ấy là chuyên gia về thực vật." },
+        { en: "Specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "Chuyên gia", ex: "She is a specialist in plants.", vi: "Cô ấy là một chuyên gia về cây cối." },
+        { en: "Language course", ipa: "/ˈlæŋɡwɪdʒ kɔːs/", vn: "Khóa học ngôn ngữ", ex: "I am taking a language course in London.", vi: "Tôi đang tham gia một khóa học ngôn ngữ ở London." },
+        { en: "Southern Italy", ipa: "/ˈsʌðən ˈɪtəli/", vn: "Miền Nam nước Ý", ex: "I am from Rome in Southern Italy.", vi: "Tôi đến từ Rome ở miền Nam nước Ý." },
+        { en: "Friendly", ipa: "/ˈfrendli/", vn: "Thân thiện", ex: "She is a quiet but friendly person.", vi: "Bà ấy là một người trầm tính nhưng thân thiện." },
+        { en: "Next month", ipa: "/nekst mʌnθ/", vn: "Tháng sau", ex: "I am coming to London next month.", vi: "Tôi sẽ đến London vào tháng sau." },
+        { en: "Computer", ipa: "/kəmˈpjuːtə(r)/", vn: "Máy tính", ex: "My son works with computers.", vi: "Con trai tôi làm việc với máy tính." },
+        { en: "Regularly", ipa: "/ˈreɡjələli/", vn: "Thường xuyên", ex: "I see them regularly.", vi: "Tôi gặp họ thường xuyên." },
+        { en: "Briefly", ipa: "/ˈbriːfli/", vn: "Ngắn gọn", ex: "Please briefly introduce yourself.", vi: "Hãy giới thiệu ngắn gọn về bản thân." },
+        { en: "Grandmother", ipa: "/ˈɡrænmʌðə(r)/", vn: "Bà", ex: "My grandmother is 80 years old.", vi: "Bà của tôi 80 tuổi." },
+        { en: "Grandchildren", ipa: "/ˈɡræn.tʃɪl.drən/", vn: "Các cháu (của ông bà)", ex: "She has three grandchildren in Spain.", vi: "Bà ấy có 3 người cháu ở Tây Ban Nha." },
+        { en: "Son", ipa: "/sʌn/", vn: "Con trai", ex: "My son is a businessman.", vi: "Con trai tôi là một doanh nhân." },
+        { en: "Daughter", ipa: "/ˈdɔːtə(r)/", vn: "Con gái", ex: "My daughter is a teacher.", vi: "Con gái tôi là giáo viên." },
+        { en: "Nephew", ipa: "/ˈnefjuː/", vn: "Cháu trai (con anh chị em)", ex: "My nephew is very cute.", vi: "Cháu trai tôi rất dễ thương." },
+        { en: "Niece", ipa: "/niːs/", vn: "Cháu gái (con anh chị em)", ex: "My niece is a student.", vi: "Cháu gái tôi là một học sinh." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let questions = [];
+
+    // Tạo bộ câu hỏi với 4 đáp án (1 đúng, 3 nhiễu ngẫu nhiên)
+    function generateQuestions() {
+        questions = vocabData.map((item, index) => {
+            const correct = item.vn;
+            const others = vocabData
+                .filter(v => v.vn !== correct)
+                .map(v => v.vn)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            
+            const options = [correct, ...others].sort(() => Math.random() - 0.5);
+            return {
+                word: item.en,
+                ipa: item.ipa,
+                correct: correct,
+                options: options,
+                ex: item.ex,
+                vi: item.vi
+            };
+        });
+    }
+
+    const bgMusic = document.getElementById('bg-music');
+    function toggleMusic() {
+        const btn = document.querySelector('.music-toggle');
+        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
+        else { bgMusic.pause(); btn.innerText = "🔇"; }
+    }
+
+    function startQuiz() {
+        generateQuestions();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-content').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('next-btn').disabled = true;
+        document.getElementById('translation-box').style.display = 'none';
+        document.getElementById('q-count').innerText = `VOCABULARY ${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+        
+        document.getElementById('question-text').innerHTML = `Đâu là nghĩa của từ: <span class="word-highlight">${q.word}</span> <small style="color:var(--text-light)">${q.ipa}</small>`;
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        const q = questions[currentIdx];
+        const allBtns = document.querySelectorAll('.opt-btn');
+        const transBox = document.getElementById('translation-box');
+
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === q.correct) {
+            btn.classList.add('correct');
+            document.getElementById('snd-correct').play();
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('snd-wrong').play();
+            allBtns.forEach(b => { if(b.innerText === q.correct) b.classList.add('correct'); });
+        }
+
+        transBox.innerHTML = `<strong>Ví dụ:</strong> ${q.ex} <br> <em>${q.vi}</em>`;
+        transBox.style.display = 'block';
+        document.getElementById('next-btn').disabled = false;
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('score-text').innerText = `${score}/${questions.length}`;
+        
+        let msg = "";
+        const percent = (score / questions.length) * 100;
+        if(percent === 100) msg = "Tuyệt vời! Bạn là bậc thầy từ vựng!";
+        else if(percent >= 70) msg = "Rất tốt! Bạn đang tiến bộ vượt bậc.";
+        else msg = "Cố gắng lên nhé, luyện tập thêm chút nữa nào!";
+        document.getElementById('result-msg').innerText = msg;
+    }
+</script>
+
+</body>
+</html>
