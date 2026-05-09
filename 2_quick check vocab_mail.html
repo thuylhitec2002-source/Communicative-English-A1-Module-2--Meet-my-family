@@ -3,43 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Vocab Quiz - Challenge Mode</title>
+    <title>Premium Vocab Quiz - Audio Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6C5CE7;
-            --success: #00B894;
-            --error: #D63031;
-            --warning: #FDCB6E;
+            --primary-hover: #5B4BC4;
+            --secondary: #A29BFE;
             --bg: #F0F3F7;
             --card-bg: #FFFFFF;
+            --text-main: #2D3436;
+            --text-light: #636E72;
+            --success: #00B894;
+            --error: #D63031;
+            --accent: #0984E3;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Quicksand', sans-serif;
-            background: var(--bg);
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+            background: radial-gradient(circle at top left, #e0e5ec, #f0f3f7);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
         }
 
-        /* --- Quiz UI --- */
-        #main-content { width: 100%; max-width: 600px; padding: 20px; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hiệu ứng lắc khi sai */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--card-bg); padding: 3.5rem 2.5rem; border-radius: 2rem;
+            box-shadow: 20px 20px 60px #d1d9e6, -20px -20px 60px #ffffff;
+            text-align: center; max-width: 400px; width: 90%; animation: fadeInUp 0.6s ease-out;
+        }
+
+        .google-btn {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid #eee;
+            background: white; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+
+        #main-content { display: none; width: 100%; max-width: 600px; padding: 20px; }
+
         .quiz-card {
-            background: var(--card-bg); border-radius: 2rem; padding: 35px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05); position: relative;
+            background: var(--card-bg); border-radius: 2.5rem; padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); animation: fadeInUp 0.5s ease-out;
         }
 
-        /* --- Hearts/Lives UI --- */
-        .lives-container {
-            display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; font-size: 1.5rem;
+        .music-toggle {
+            position: fixed; top: 25px; right: 25px; width: 50px; height: 50px; border-radius: 50%;
+            background: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 100;
         }
 
-        .word-highlight {
-            color: var(--primary); background: #f0eeff; padding: 8px 15px;
-            border-radius: 12px; display: inline-flex; align-items: center; gap: 10px;
-            cursor: pointer; font-weight: 700; font-size: 1.5rem; margin: 15px 0;
-        }
+        .progress-container { height: 10px; background: #edf2f7; border-radius: 20px; margin: 25px 0; overflow: hidden; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.4s; }
 
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .question-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
+        .word-highlight { 
+            color: var(--primary); background: #f0eeff; padding: 4px 12px; border-radius: 8px; 
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+        }
+        .speaker-icon { font-size: 1.1rem; color: var(--primary); }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
 
         .opt-btn {
             padding: 18px; border: 2px solid #f1f3f5; border-radius: 1.2rem;
@@ -47,105 +92,196 @@
             font-weight: 600; text-align: left; transition: all 0.2s;
         }
 
-        .opt-btn:hover:not(:disabled) { border-color: var(--primary); transform: translateX(5px); }
+        .opt-btn:hover:not(:disabled) { border-color: var(--primary); transform: translateX(8px); background: #fcfbff; }
         .opt-btn.correct { background: #d1fae5 !important; border-color: var(--success) !important; color: #065f46; }
         .opt-btn.wrong { background: #fee2e2 !important; border-color: var(--error) !important; color: #991b1b; animation: shake 0.4s; }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
         .translation-box {
-            background: #fdf9f0; border-left: 5px solid var(--warning); padding: 15px;
-            border-radius: 8px; margin-top: 20px; display: none;
+            background: #f8f9fa; border-left: 5px solid var(--accent); padding: 15px;
+            border-radius: 0 12px 12px 0; margin-bottom: 20px; display: none; animation: fadeInUp 0.4s;
         }
 
-        .btn-next {
+        .btn-main {
             width: 100%; padding: 16px; border-radius: 1rem; border: none;
-            background: var(--primary); color: white; font-weight: 700;
-            margin-top: 20px; cursor: pointer; display: none;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+            background: var(--primary); color: white; transition: 0.3s;
         }
+        .btn-main:disabled { background: #cbd5e0; cursor: not-allowed; }
+
+        #result-screen { display: none; text-align: center; }
     </style>
 </head>
 <body>
 
-<main id="main-content">
-    <div class="quiz-card">
-        <div id="quiz-ui">
-            <div class="lives-container" id="lives-display">❤️❤️❤️</div>
-            <div id="q-count" style="text-align:center; font-weight:700; color:#b2bec3"></div>
-            
-            <div style="text-align: center;">
-                <div id="question-word" class="word-highlight" onclick="speakCurrentWord()"></div>
-                <div id="ipa-text" style="color: #636e72; margin-bottom: 20px;"></div>
-            </div>
+<button class="music-toggle" onclick="toggleMusic()">🔇</button>
 
-            <div id="options-container" class="options-grid"></div>
-            <div id="translation-box" class="translation-box"></div>
-            <button id="next-btn" class="btn-next" onclick="nextQuestion()">Tiếp tục →</button>
+<div id="login-screen">
+    <div class="login-card">
+        <h2>Chào bạn quay lại!</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Đăng nhập để luyện phát âm cùng AI</p>
+        <button id="login-btn" class="google-btn">
+            Tiếp tục với Google
+        </button>
+        <div id="login-msg" style="margin-top: 15px; color: var(--error);"></div>
+    </div>
+</div>
+
+<main id="main-content">
+    <div id="quiz-container" class="quiz-card">
+        <div id="start-screen" style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🎧</div>
+            <h1>Vocab & Pronunciation</h1>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Học sinh có tối đa 3 cơ hội cho mỗi câu hỏi.</p>
+            <button class="btn-main" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
         </div>
 
-        <div id="result-screen" style="display:none; text-align:center;">
-            <h1>Kết thúc bài học!</h1>
-            <h2 id="final-score"></h2>
-            <button class="btn-next" style="display:block" onclick="location.reload()">Làm lại</button>
+        <div id="quiz-content" style="display: none;">
+            <div class="progress-container"><div id="progress-fill"></div></div>
+            <div id="q-count" style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 10px;"></div>
+            
+            <div id="question-text" class="question-title"></div>
+            
+            <div id="translation-box" class="translation-box"></div>
+            <div id="options-container" class="options-grid"></div>
+
+            <button id="next-btn" class="btn-main" onclick="nextQuestion()" disabled>Câu tiếp theo</button>
+        </div>
+
+        <div id="result-screen">
+            <div style="font-size: 4rem; margin-bottom: 15px;">🏆</div>
+            <h2>Hoàn thành xuất sắc!</h2>
+            <h1 id="score-text" style="color: var(--primary);">0/0</h1>
+            <button class="btn-main" onclick="location.reload()">Luyện lại từ đầu</button>
         </div>
     </div>
 </main>
 
+<audio id="bg-music" loop src="https://vnso-pt-7-tf-a128-z3.zmdcdn.me/25de35937e1e650b577265725f162e6f?authen=exp=1774627563~acl=/25de35937e1e650b577265725f162e6f*~hmac=37d9728c9b8d4c33f4bef14a8d69ef2c"></audio>
 <audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1"></audio>
 <audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_8b0fae46ef.mp3"></audio>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { checkUserPermission(user.email); } 
+        else {
+            document.getElementById("login-screen").style.display = "flex";
+            document.getElementById("main-content").style.display = "none";
+        }
+    });
+
+    async function checkUserPermission(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("main-content").style.display = "block";
+        } else {
+            document.getElementById("login-msg").innerText = "Email không có quyền truy cập!";
+            signOut(auth);
+        }
+    }
+
+    document.getElementById("login-btn").onclick = async () => {
+        try { await signInWithPopup(auth, provider); } 
+        catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
+    };
+</script>
+
 <script>
-    // Dữ liệu từ vựng với "Nhiễu gần nghĩa" (Smart Distractors)
-    const vocabData = [
-        { en: "Homestay accommodation", ipa: "/ˈhəʊmsteɪ/", vn: "Ở cùng dân bản xứ", distractors: ["Khách sạn 5 sao", "Cắm trại ngoài trời", "Ký túc xá trường"], ex: "We chose homestay accommodation.", vi: "Chúng tôi chọn ở cùng dân bản xứ." },
-        { en: "Host", ipa: "/həʊst/", vn: "Chủ nhà", distractors: ["Khách thuê", "Người làm vườn", "Người môi giới"], ex: "Our host was very kind.", vi: "Chủ nhà của chúng tôi rất tốt bụng." },
-        { en: "Retired", ipa: "/rɪˈtaɪəd/", vn: "Đã nghỉ hưu", distractors: ["Đang tìm việc", "Đang đi học", "Đã bị sa thải"], ex: "He is a retired teacher.", vi: "Ông ấy là giáo viên đã nghỉ hưu." },
-        { en: "Gardening", ipa: "/ˈɡɑːdnɪŋ/", vn: "Làm vườn", distractors: ["Nấu ăn", "Dọn dẹp nhà", "Trồng rừng"], ex: "She loves gardening.", vi: "Bà ấy yêu làm vườn." },
-        { en: "Specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "Chuyên gia", distractors: ["Người mới học", "Thực tập sinh", "Bệnh nhân"], ex: "She is a specialist in eye surgery.", vi: "Cô ấy là chuyên gia phẫu thuật mắt." },
-        { en: "Friendly", ipa: "/ˈfrendli/", vn: "Thân thiện", distractors: ["Khó gần", "Nguy hiểm", "Lạnh lùng"], ex: "The staff is friendly.", vi: "Nhân viên rất thân thiện." },
-        { en: "Regularly", ipa: "/ˈreɡjələli/", vn: "Thường xuyên", distractors: ["Hiếm khi", "Chưa bao giờ", "Đôi khi"], ex: "Exercise regularly.", vi: "Tập thể dục thường xuyên." },
-        { en: "Briefly", ipa: "/ˈbriːfli/", vn: "Ngắn gọn", distractors: ["Chi tiết", "Dài dòng", "Lan man"], ex: "Please explain briefly.", vi: "Vui lòng giải thích ngắn gọn." },
-        { en: "Nephew", ipa: "/ˈnefjuː/", vn: "Cháu trai (con anh chị em)", distractors: ["Cháu gái", "Con trai", "Anh họ"], ex: "My nephew is 5.", vi: "Cháu trai tôi 5 tuổi." },
-        { en: "Reserved", ipa: "/rɪˈzɜːvd/", vn: "Kín đáo / Trầm tính", distractors: ["Cởi mở", "Ồn ào", "Tự tin"], ex: "He is a reserved person.", vi: "Anh ấy là người trầm tính." },
-        { en: "Be close to", ipa: "/bi kləʊs tuː/", vn: "Gần với", distractors: ["Xa cách", "Đối diện", "Nằm trong"], ex: "It's close to the sea.", vi: "Nó gần biển." },
-        { en: "Be far from", ipa: "/bi fɑːr frəm/", vn: "Xa khỏi", distractors: ["Sát bên", "Gần đây", "Bên cạnh"], ex: "It's far from here.", vi: "Nó cách xa đây." },
-        { en: "Rent a house", ipa: "/rent ə haʊs/", vn: "Thuê một căn nhà", distractors: ["Mua nhà", "Bán nhà", "Sửa nhà"], ex: "I want to rent a house.", vi: "Tôi muốn thuê một căn nhà." }
+    // Danh sách từ vựng với "Smart Distractors" (Gần nghĩa)
+    const rawVocab = [
+        { en: "Homestay accommodation", ipa: "/ˈhəʊmsteɪ/", vn: "Ở cùng dân bản xứ", distractors: ["Khách sạn cao cấp", "Nhà trọ sinh viên", "Căn hộ chung cư"], ex: "We send you information about your homestay accommodation.", vi: "Chúng tôi gửi thông tin về việc ở cùng dân bản xứ cho bạn." },
+        { en: "Host", ipa: "/həʊst/", vn: "Chủ nhà", distractors: ["Khách mời", "Người giúp việc", "Người hàng xóm"], ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
+        { en: "Retired", ipa: "/rɪˈtaɪəd/", vn: "Đã nghỉ hưu", distractors: ["Đang thất nghiệp", "Đã nghỉ việc", "Đang đi học"], ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Doctor", ipa: "/ˈdɒk.tər/", vn: "Bác sĩ", distractors: ["Y tá", "Dược sĩ", "Bệnh nhân"], ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
+        { en: "Gardening", ipa: "/ˈɡɑːdnɪŋ/", vn: "Làm vườn", distractors: ["Nấu ăn", "Trồng cây rừng", "Dọn dẹp nhà"], ex: "She loves gardening and plants.", vi: "Bà ấy yêu làm vườn và cây cối." },
+        { en: "Plant", ipa: "/plɑːnt/", vn: "Cây cối / Thực vật", distractors: ["Động vật", "Rừng rậm", "Đất đai"], ex: "Her daughter is a specialist in plants.", vi: "Con gái bà ấy là chuyên gia về thực vật." },
+        { en: "Specialist", ipa: "/ˈspeʃ.əl.ɪst/", vn: "Chuyên gia", distractors: ["Người mới học", "Thực tập sinh", "Cán bộ"], ex: "She is a specialist in plants.", vi: "Cô ấy là một chuyên gia về cây cối." },
+        { en: "Language course", ipa: "/ˈlæŋɡwɪdʒ kɔːs/", vn: "Khóa học ngôn ngữ", distractors: ["Trường học quốc tế", "Sách giáo khoa", "Câu lạc bộ tiếng Anh"], ex: "I am taking a language course in London.", vi: "Tôi đang tham gia một khóa học ngôn ngữ ở London." },
+        { en: "Southern Italy", ipa: "/ˈsʌðən ˈɪtəli/", vn: "Miền Nam nước Ý", distractors: ["Miền Bắc nước Ý", "Trung tâm nước Ý", "Vùng biên giới Ý"], ex: "I am from Rome in Southern Italy.", vi: "Tôi đến từ Rome ở miền Nam nước Ý." },
+        { en: "Friendly", ipa: "/ˈfrendli/", vn: "Thân thiện", distractors: ["Tử tế", "Vui vẻ", "Hòa đồng (nhưng lạnh lùng)"], ex: "She is a quiet but friendly person.", vi: "Bà ấy là một người trầm tính nhưng thân thiện." },
+        { en: "Next month", ipa: "/nekst mʌnθ/", vn: "Tháng sau", distractors: ["Tháng tới", "Tuần sau", "Năm sau"], ex: "I am coming to London next month.", vi: "Tôi sẽ đến London vào tháng sau." },
+        { en: "Computer", ipa: "/kəmˈpjuːtə(r)//", vn: "Máy tính", distractors: ["Tivi", "Điện thoại", "Đồ điện tử"], ex: "My son works with computers.", vi: "Con trai tôi làm việc với máy tính." },
+        { en: "Regularly", ipa: "/ˈreɡjələli/", vn: "Thường xuyên", distractors: ["Hiếm khi", "Đôi khi", "Luôn luôn"], ex: "I see them regularly.", vi: "Tôi gặp họ thường xuyên." },
+        { en: "Briefly", ipa: "/ˈbriːfli/", vn: "Ngắn gọn", distractors: ["Chi tiết", "Sơ sài", "Đầy đủ"], ex: "Please briefly introduce yourself.", vi: "Hãy giới thiệu ngắn gọn về bản thân." },
+        { en: "Grandmother", ipa: "/ˈɡrænmʌðə(r)/", vn: "Bà", distractors: ["Mẹ", "Dì", "Bà ngoại (người lạ)"], ex: "My grandmother is 80 years old.", vi: "Bà của tôi 80 tuổi." },
+        { en: "Grandchildren", ipa: "/ˈɡræn.tʃɪl.drən/", vn: "Các cháu (của ông bà)", distractors: ["Con cái", "Cháu họ", "Em bé"], ex: "She has three grandchildren in Spain.", vi: "Bà ấy có 3 người cháu ở Tây Ban Nha." },
+        { en: "Son", ipa: "/sʌn/", vn: "Con trai", distractors: ["Con gái", "Em trai", "Cháu trai"], ex: "My son is a businessman.", vi: "Con trai tôi là một doanh nhân." },
+        { en: "Daughter", ipa: "/ˈdɔːtə(r)/", vn: "Con gái", distractors: ["Con trai", "Em gái", "Cháu gái"], ex: "My daughter is a teacher.", vi: "Con gái tôi là giáo viên." },
+        { en: "Nephew", ipa: "/ˈnefjuː/", vn: "Cháu trai (con anh chị em)", distractors: ["Cháu gái", "Con trai", "Anh họ"], ex: "My nephew is very cute.", vi: "Cháu trai tôi rất dễ thương." },
+        { en: "Niece", ipa: "/niːs/", vn: "Cháu gái (con anh chị em)", distractors: ["Cháu trai", "Con gái", "Chị họ"], ex: "My niece is a student.", vi: "Cháu gái tôi là một học sinh." },
+        { en: "Be close to", ipa: "/bi kləʊs tuː/", vn: "Gần với (địa điểm)", distractors: ["Nằm trong", "Ở trên", "Bên cạnh (xa)"], ex: "Our school is close to the park.", vi: "Trường chúng tôi gần với công viên." },
+        { en: "Be far from", ipa: "/bi fɑːr frəm/", vn: "Xa khỏi", distractors: ["Cách biệt", "Rời khỏi", "Đi khỏi"], ex: "The house is far from the city center.", vi: "Ngôi nhà này nằm xa trung tâm thành phố." },
+        { en: "Reserved", ipa: "/rɪˈzɜːvd/", vn: "Kín đáo / Trầm tính", distractors: ["Nhút nhát", "Khó gần", "Nghiêm túc"], ex: "He is a bit reserved and quiet.", vi: "Anh ấy có chút kín đáo và trầm tính." },
+        { en: "Rent a house", ipa: "/rent ə haʊs/", vn: "Thuê một căn nhà", distractors: ["Mua nhà", "Sửa nhà", "Xây nhà"], ex: "They want to rent a house in London.", vi: "Họ muốn thuê một căn nhà ở London." }
     ];
 
     let currentIdx = 0;
     let score = 0;
-    let lives = 3;
-    let isAnswered = false;
+    let questions = [];
+    let wrongCount = 0; // Biến đếm số lần sai trong 1 câu
+    let isLocked = false; // Khóa câu hỏi khi đã chọn đúng hoặc hết cơ hội
 
-    function speakCurrentWord() {
-        const msg = new SpeechSynthesisUtterance(vocabData[currentIdx].en);
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'en-US';
+        msg.rate = 0.9;
         window.speechSynthesis.speak(msg);
     }
 
+    function generateQuestions() {
+        questions = rawVocab.map(item => {
+            const options = [item.vn, ...item.distractors].sort(() => Math.random() - 0.5);
+            return { ...item, options };
+        }).sort(() => Math.random() - 0.5);
+    }
+
+    function startQuiz() {
+        generateQuestions();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-content').style.display = 'block';
+        loadQuestion();
+    }
+
     function loadQuestion() {
-        isAnswered = false;
-        lives = 3;
-        updateLivesUI();
-        
-        const q = vocabData[currentIdx];
-        document.getElementById('next-btn').style.display = 'none';
+        const q = questions[currentIdx];
+        wrongCount = 0;
+        isLocked = false;
+        document.getElementById('next-btn').disabled = true;
         document.getElementById('translation-box').style.display = 'none';
-        document.getElementById('q-count').innerText = `CÂU ${currentIdx + 1} / ${vocabData.length}`;
-        document.getElementById('question-word').innerText = q.en;
-        document.getElementById('ipa-text').innerText = q.ipa;
+        document.getElementById('q-count').innerText = `TỪ VỰNG ${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
         
-        // Trộn đáp án đúng và 3 nhiễu
-        const options = [q.vn, ...q.distractors].sort(() => Math.random() - 0.5);
-        
+        document.getElementById('question-text').innerHTML = `
+            Nghĩa của từ này là gì? <br>
+            <span class="word-highlight" onclick="speak('${q.en}')">
+                ${q.en} <span class="speaker-icon">🔊</span>
+            </span>
+            <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">${q.ipa}</div>
+        `;
+
         const container = document.getElementById('options-container');
         container.innerHTML = '';
-        
-        options.forEach(opt => {
+        q.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
             btn.innerText = opt;
@@ -153,79 +289,73 @@
             container.appendChild(btn);
         });
 
-        speakCurrentWord();
-    }
-
-    function updateLivesUI() {
-        const display = document.getElementById('lives-display');
-        display.innerHTML = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        setTimeout(() => speak(q.en), 500); 
     }
 
     function checkAnswer(selected, btn) {
-        if (isAnswered) return;
-        
-        const q = vocabData[currentIdx];
-        
+        if (isLocked) return;
+
+        const q = questions[currentIdx];
+        const allBtns = document.querySelectorAll('.opt-btn');
+
         if (selected === q.vn) {
-            // ĐÚNG
+            // TRƯỜNG HỢP CHỌN ĐÚNG
             btn.classList.add('correct');
             document.getElementById('snd-correct').play();
-            score++;
-            finishQuestion();
+            if (wrongCount === 0) score++; // Chỉ cộng điểm nếu đúng ngay lần đầu
+            endQuestion();
         } else {
-            // SAI
-            lives--;
-            updateLivesUI();
+            // TRƯỜNG HỢP CHỌN SAI
+            wrongCount++;
             btn.classList.add('wrong');
-            btn.disabled = true; // Không cho chọn lại nút đó
             document.getElementById('snd-wrong').play();
+            btn.disabled = true; // Vô hiệu hóa nút đã chọn sai
 
-            if (lives <= 0) {
-                // Hết lượt
-                revealCorrectAnswer();
-                finishQuestion();
+            // Nếu đã chọn sai cả 3 đáp án nhiễu
+            if (wrongCount >= 3) {
+                endQuestion();
             }
         }
     }
 
-    function revealCorrectAnswer() {
-        const btns = document.querySelectorAll('.opt-btn');
-        btns.forEach(b => {
-            if (b.innerText === vocabData[currentIdx].vn) {
+    function endQuestion() {
+        isLocked = true;
+        const q = questions[currentIdx];
+        const allBtns = document.querySelectorAll('.opt-btn');
+        
+        // Luôn làm nổi bật đáp án đúng khi kết thúc câu hỏi
+        allBtns.forEach(b => {
+            b.disabled = true;
+            if (b.innerText === q.vn) {
                 b.classList.add('correct');
             }
         });
-    }
 
-    function finishQuestion() {
-        isAnswered = true;
-        const btns = document.querySelectorAll('.opt-btn');
-        btns.forEach(b => b.disabled = true);
-        
-        const q = vocabData[currentIdx];
         const box = document.getElementById('translation-box');
-        box.innerHTML = `<strong>Ví dụ:</strong> ${q.ex} <br> <em>${q.vi}</em>`;
+        box.innerHTML = `<strong>Ex:</strong> ${q.ex} <br> <em>${q.vi}</em>`;
         box.style.display = 'block';
-        document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('next-btn').disabled = false;
     }
 
     function nextQuestion() {
         currentIdx++;
-        if (currentIdx < vocabData.length) {
-            loadQuestion();
-        } else {
-            showResult();
-        }
+        if (currentIdx < questions.length) loadQuestion();
+        else showResult();
     }
 
     function showResult() {
-        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('quiz-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('final-score').innerText = `Bạn đúng ${score}/${vocabData.length} câu!`;
+        document.getElementById('score-text').innerText = `${score}/${questions.length}`;
     }
 
-    // Khởi tạo
-    loadQuestion();
+    const bgMusic = document.getElementById('bg-music');
+    window.toggleMusic = function() {
+        const btn = document.querySelector('.music-toggle');
+        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
+        else { bgMusic.pause(); btn.innerText = "🔇"; }
+    }
 </script>
+
 </body>
 </html>
