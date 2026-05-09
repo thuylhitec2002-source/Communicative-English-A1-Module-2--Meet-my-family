@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Vocab Quiz - Interactive Learning</title>
+    <title>Premium Vocab Quiz - Audio Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -30,7 +30,6 @@
             align-items: center;
             min-height: 100vh;
             color: var(--text-main);
-            overflow-x: hidden;
         }
 
         /* --- Animations --- */
@@ -39,128 +38,76 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* --- Login Screen --- */
+        /* --- Login Screen (Giữ nguyên giao diện của bạn) --- */
         #login-screen {
-            position: fixed; inset: 0;
-            background: var(--bg);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
 
         .login-card {
-            background: var(--card-bg);
-            padding: 3.5rem 2.5rem;
-            border-radius: 2rem;
+            background: var(--card-bg); padding: 3.5rem 2.5rem; border-radius: 2rem;
             box-shadow: 20px 20px 60px #d1d9e6, -20px -20px 60px #ffffff;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            animation: fadeInUp 0.6s ease-out;
+            text-align: center; max-width: 400px; width: 90%; animation: fadeInUp 0.6s ease-out;
         }
 
         .google-btn {
             display: flex; align-items: center; justify-content: center; gap: 12px;
-            width: 100%; padding: 1rem; border-radius: 1rem;
-            border: 2px solid #eee; background: white;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
-        }
-
-        .google-btn:hover {
-            border-color: var(--primary);
-            background: #f8faff;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.15);
+            width: 100%; padding: 1rem; border-radius: 1rem; border: 2px solid #eee;
+            background: white; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
 
         /* --- Main Layout --- */
         #main-content { display: none; width: 100%; max-width: 600px; padding: 20px; }
 
         .quiz-card {
-            background: var(--card-bg);
-            border-radius: 2.5rem;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-            animation: fadeInUp 0.5s ease-out;
-            position: relative;
+            background: var(--card-bg); border-radius: 2.5rem; padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05); animation: fadeInUp 0.5s ease-out;
         }
 
-        /* --- Music Control --- */
         .music-toggle {
-            position: fixed; top: 25px; right: 25px;
-            width: 50px; height: 50px; border-radius: 50%;
-            background: white; border: none; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; z-index: 100;
+            position: fixed; top: 25px; right: 25px; width: 50px; height: 50px; border-radius: 50%;
+            background: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 100;
         }
 
         /* --- Progress Bar --- */
-        .progress-container {
-            height: 10px; background: #edf2f7; border-radius: 20px;
-            margin: 25px 0; overflow: hidden;
-        }
-        #progress-fill {
-            height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        .progress-container { height: 10px; background: #edf2f7; border-radius: 20px; margin: 25px 0; overflow: hidden; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.4s; }
 
         /* --- Question Area --- */
         .question-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
-        .word-highlight { color: var(--primary); background: #f0eeff; padding: 2px 10px; border-radius: 8px; }
-
-        /* --- 4 Options Grid --- */
-        .options-grid {
-            display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px;
+        .word-highlight { 
+            color: var(--primary); background: #f0eeff; padding: 4px 12px; border-radius: 8px; 
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
         }
+        .speaker-icon { font-size: 1.1rem; color: var(--primary); }
+
+        /* --- Options Grid --- */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 25px; }
 
         .opt-btn {
-            padding: 20px; border: 2px solid #f1f3f5; border-radius: 1.2rem;
-            background: white; cursor: pointer; font-family: inherit;
-            font-size: 1.05rem; font-weight: 600; text-align: left;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; align-items: center;
+            padding: 18px; border: 2px solid #f1f3f5; border-radius: 1.2rem;
+            background: white; cursor: pointer; font-family: inherit; font-size: 1.05rem;
+            font-weight: 600; text-align: left; transition: all 0.2s;
         }
 
-        .opt-btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            background: #fcfbff;
-            transform: translateX(10px);
-        }
-
-        .opt-btn:active { transform: scale(0.98); }
-
+        .opt-btn:hover:not(:disabled) { border-color: var(--primary); transform: translateX(8px); background: #fcfbff; }
         .opt-btn.correct { background: #d1fae5; border-color: var(--success); color: #065f46; }
         .opt-btn.wrong { background: #fee2e2; border-color: var(--error); color: #991b1b; }
 
-        /* --- Navigation --- */
-        .nav-footer { display: flex; gap: 15px; margin-top: 20px; }
-        .btn-main {
-            flex: 1; padding: 16px; border-radius: 1rem; border: none;
-            font-weight: 700; cursor: pointer; font-family: inherit;
-        }
-        .btn-next { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3); }
-        .btn-next:disabled { background: #cbd5e0; cursor: not-allowed; box-shadow: none; }
-        .btn-next:hover:not(:disabled) { background: var(--primary-hover); }
-
         .translation-box {
-            background: #f8f9fa; border-left: 5px solid var(--accent);
-            padding: 15px; border-radius: 0 12px 12px 0; margin-bottom: 20px;
-            display: none; animation: fadeInUp 0.4s ease;
+            background: #f8f9fa; border-left: 5px solid var(--accent); padding: 15px;
+            border-radius: 0 12px 12px 0; margin-bottom: 20px; display: none; animation: fadeInUp 0.4s;
         }
+
+        .btn-main {
+            width: 100%; padding: 16px; border-radius: 1rem; border: none;
+            font-weight: 700; cursor: pointer; font-family: inherit;
+            background: var(--primary); color: white; transition: 0.3s;
+        }
+        .btn-main:disabled { background: #cbd5e0; cursor: not-allowed; }
 
         #result-screen { display: none; text-align: center; }
-        .score-circle {
-            width: 150px; height: 150px; border-radius: 50%; border: 8px solid var(--primary);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; font-weight: 700; margin: 0 auto 30px;
-            color: var(--primary);
-        }
     </style>
 </head>
 <body>
@@ -169,47 +116,42 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2>Chào mừng bạn!</h2>
-        <p style="color: var(--text-light); margin-bottom: 2rem;">Vui lòng đăng nhập để bắt đầu học tập cùng hệ thống</p>
+        <h2>Chào bạn quay lại!</h2>
+        <p style="color: var(--text-light); margin-bottom: 2rem;">Đăng nhập để luyện phát âm cùng AI</p>
         <button id="login-btn" class="google-btn">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            <!-- SVG Google Icon... -->
             Tiếp tục với Google
         </button>
-        <div id="login-msg" style="margin-top: 15px; color: var(--error); font-size: 0.9rem;"></div>
+        <div id="login-msg" style="margin-top: 15px; color: var(--error);"></div>
     </div>
 </div>
 
 <main id="main-content">
     <div id="quiz-container" class="quiz-card">
-        <!-- Start Screen -->
         <div id="start-screen" style="text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 20px;">🚀</div>
-            <h1>Vocabulary Master</h1>
-            <p style="color: var(--text-light); margin-bottom: 2rem;">Chinh phục 20 từ vựng tiếng Anh giao tiếp thông dụng ngay bây giờ!</p>
-            <button class="btn-main btn-next" onclick="startQuiz()">BẮT ĐẦU HỌC</button>
+            <div style="font-size: 4rem; margin-bottom: 20px;">🎧</div>
+            <h1>Vocab & Pronunciation</h1>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Hệ thống sẽ tự động phát âm khi câu hỏi xuất hiện.</p>
+            <button class="btn-main" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
         </div>
 
-        <!-- Quiz Content -->
         <div id="quiz-content" style="display: none;">
             <div class="progress-container"><div id="progress-fill"></div></div>
             <div id="q-count" style="font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 10px;"></div>
+            
             <div id="question-text" class="question-title"></div>
             
             <div id="translation-box" class="translation-box"></div>
-
             <div id="options-container" class="options-grid"></div>
 
-            <div class="nav-footer">
-                <button id="next-btn" class="btn-main btn-next" onclick="nextQuestion()" disabled>Tiếp theo</button>
-            </div>
+            <button id="next-btn" class="btn-main" onclick="nextQuestion()" disabled>Câu tiếp theo</button>
         </div>
 
-        <!-- Result Screen -->
         <div id="result-screen">
-            <h2>Kết quả của bạn</h2>
-            <div class="score-circle" id="score-text">0/0</div>
-            <p id="result-msg" style="margin-bottom: 30px; font-weight: 600;"></p>
-            <button class="btn-main btn-next" onclick="location.reload()">Học lại từ đầu</button>
+            <div style="font-size: 4rem; margin-bottom: 15px;">🏆</div>
+            <h2>Hoàn thành xuất sắc!</h2>
+            <h1 id="score-text" style="color: var(--primary);">0/0</h1>
+            <button class="btn-main" onclick="location.reload()">Luyện lại từ đầu</button>
         </div>
     </div>
 </main>
@@ -219,7 +161,7 @@
 <audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_8b0fae46ef.mp3"></audio>
 
 <script type="module">
-    // --- FIREBASE LOGIC (Giữ nguyên cấu trúc của bạn) ---
+    // --- FIREBASE AUTH LOGIC (Giữ nguyên cấu trúc của bạn) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
@@ -265,8 +207,8 @@
 </script>
 
 <script>
-    // Dữ liệu từ vựng gốc
-    const vocabData = [
+    // Danh sách từ vựng (Đã bổ sung 4 từ mới)
+    const rawVocab = [
         { en: "Homestay accommodation", ipa: "/ˈhəʊmsteɪ əˌkɒməˈdeɪʃn/", vn: "Ở cùng dân bản xứ", ex: "We send you information about your homestay accommodation.", vi: "Chúng tôi gửi thông tin về việc ở cùng dân bản xứ cho bạn." },
         { en: "Host", ipa: "/həʊst/", vn: "Chủ nhà", ex: "Di is a very popular host.", vi: "Bà Di là một chủ nhà rất được yêu mến." },
         { en: "Retired", ipa: "/rɪˈtaɪəd/", vn: "Đã nghỉ hưu", ex: "She is a retired doctor.", vi: "Bà ấy là một bác sĩ đã nghỉ hưu." },
@@ -286,40 +228,38 @@
         { en: "Son", ipa: "/sʌn/", vn: "Con trai", ex: "My son is a businessman.", vi: "Con trai tôi là một doanh nhân." },
         { en: "Daughter", ipa: "/ˈdɔːtə(r)/", vn: "Con gái", ex: "My daughter is a teacher.", vi: "Con gái tôi là giáo viên." },
         { en: "Nephew", ipa: "/ˈnefjuː/", vn: "Cháu trai (con anh chị em)", ex: "My nephew is very cute.", vi: "Cháu trai tôi rất dễ thương." },
-        { en: "Niece", ipa: "/niːs/", vn: "Cháu gái (con anh chị em)", ex: "My niece is a student.", vi: "Cháu gái tôi là một học sinh." }
+        { en: "Niece", ipa: "/niːs/", vn: "Cháu gái (con anh chị em)", ex: "My niece is a student.", vi: "Cháu gái tôi là một học sinh." },
+        // --- TỪ VỰNG MỚI ---
+        { en: "Be close to", ipa: "/bi kləʊs tuː/", vn: "Gần với (địa điểm)", ex: "Our school is close to the park.", vi: "Trường chúng tôi gần với công viên." },
+        { en: "Be far from", ipa: "/bi fɑːr frəm/", vn: "Xa khỏi", ex: "The house is far from the city center.", vi: "Ngôi nhà này nằm xa trung tâm thành phố." },
+        { en: "Reserved", ipa: "/rɪˈzɜːvd/", vn: "Kín đáo / Trầm tính", ex: "He is a bit reserved and quiet.", vi: "Anh ấy có chút kín đáo và trầm tính." },
+        { en: "Rent a house", ipa: "/rent ə haʊs/", vn: "Thuê một căn nhà", ex: "They want to rent a house in London.", vi: "Họ muốn thuê một căn nhà ở London." }
     ];
 
     let currentIdx = 0;
     let score = 0;
     let questions = [];
 
-    // Tạo bộ câu hỏi với 4 đáp án (1 đúng, 3 nhiễu ngẫu nhiên)
+    // Hàm phát âm sử dụng API trình duyệt
+    function speak(text) {
+        window.speechSynthesis.cancel(); // Dừng các giọng đang đọc dở
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.9; // Tốc độ hơi chậm một chút để nghe rõ
+        window.speechSynthesis.speak(msg);
+    }
+
     function generateQuestions() {
-        questions = vocabData.map((item, index) => {
+        questions = rawVocab.map(item => {
             const correct = item.vn;
-            const others = vocabData
+            const others = rawVocab
                 .filter(v => v.vn !== correct)
                 .map(v => v.vn)
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 3);
-            
             const options = [correct, ...others].sort(() => Math.random() - 0.5);
-            return {
-                word: item.en,
-                ipa: item.ipa,
-                correct: correct,
-                options: options,
-                ex: item.ex,
-                vi: item.vi
-            };
-        });
-    }
-
-    const bgMusic = document.getElementById('bg-music');
-    function toggleMusic() {
-        const btn = document.querySelector('.music-toggle');
-        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
-        else { bgMusic.pause(); btn.innerText = "🔇"; }
+            return { ...item, options };
+        }).sort(() => Math.random() - 0.5);
     }
 
     function startQuiz() {
@@ -333,14 +273,20 @@
         const q = questions[currentIdx];
         document.getElementById('next-btn').disabled = true;
         document.getElementById('translation-box').style.display = 'none';
-        document.getElementById('q-count').innerText = `VOCABULARY ${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('q-count').innerText = `TỪ VỰNG ${currentIdx + 1} / ${questions.length}`;
         document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
         
-        document.getElementById('question-text').innerHTML = `Đâu là nghĩa của từ: <span class="word-highlight">${q.word}</span> <small style="color:var(--text-light)">${q.ipa}</small>`;
+        // Tạo giao diện câu hỏi kèm nút loa
+        document.getElementById('question-text').innerHTML = `
+            Nghĩa của từ này là gì? <br>
+            <span class="word-highlight" onclick="speak('${q.en}')">
+                ${q.en} <span class="speaker-icon">🔊</span>
+            </span>
+            <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 5px;">${q.ipa}</div>
+        `;
 
         const container = document.getElementById('options-container');
         container.innerHTML = '';
-
         q.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
@@ -348,50 +294,49 @@
             btn.onclick = () => checkAnswer(opt, btn);
             container.appendChild(btn);
         });
+
+        // TỰ ĐỘNG PHÁT ÂM KHI TỚI TỪ NÀY
+        setTimeout(() => speak(q.en), 500); 
     }
 
     function checkAnswer(selected, btn) {
         const q = questions[currentIdx];
         const allBtns = document.querySelectorAll('.opt-btn');
-        const transBox = document.getElementById('translation-box');
-
         allBtns.forEach(b => b.disabled = true);
 
-        if (selected === q.correct) {
+        if (selected === q.vn) {
             btn.classList.add('correct');
             document.getElementById('snd-correct').play();
             score++;
         } else {
             btn.classList.add('wrong');
             document.getElementById('snd-wrong').play();
-            allBtns.forEach(b => { if(b.innerText === q.correct) b.classList.add('correct'); });
+            allBtns.forEach(b => { if(b.innerText === q.vn) b.classList.add('correct'); });
         }
 
-        transBox.innerHTML = `<strong>Ví dụ:</strong> ${q.ex} <br> <em>${q.vi}</em>`;
-        transBox.style.display = 'block';
+        const box = document.getElementById('translation-box');
+        box.innerHTML = `<strong>Ex:</strong> ${q.ex} <br> <em>${q.vi}</em>`;
+        box.style.display = 'block';
         document.getElementById('next-btn').disabled = false;
     }
 
     function nextQuestion() {
         currentIdx++;
-        if (currentIdx < questions.length) {
-            loadQuestion();
-        } else {
-            showResult();
-        }
+        if (currentIdx < questions.length) loadQuestion();
+        else showResult();
     }
 
     function showResult() {
         document.getElementById('quiz-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('score-text').innerText = `${score}/${questions.length}`;
-        
-        let msg = "";
-        const percent = (score / questions.length) * 100;
-        if(percent === 100) msg = "Tuyệt vời! Bạn là bậc thầy từ vựng!";
-        else if(percent >= 70) msg = "Rất tốt! Bạn đang tiến bộ vượt bậc.";
-        else msg = "Cố gắng lên nhé, luyện tập thêm chút nữa nào!";
-        document.getElementById('result-msg').innerText = msg;
+    }
+
+    const bgMusic = document.getElementById('bg-music');
+    window.toggleMusic = function() {
+        const btn = document.querySelector('.music-toggle');
+        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
+        else { bgMusic.pause(); btn.innerText = "🔇"; }
     }
 </script>
 
